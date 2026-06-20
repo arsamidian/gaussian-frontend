@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>108 Springbank Hill Drive SW — Gaussian Property Portal</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0E0E10;
+    --panel:#16161A;
+    --panel-soft:#1C1C21;
+    --hair:#2A2A30;
+    --bone:#F4F2EC;
+    --bone-dim:#A8A6A0;
+    --gold:#C9A368;
+    --gold-soft:#E4CFA0;
+    --signal:#7FE3B4;
+    --rust:#C97B4A;
+  }
+  *{scrollbar-width: thin; scrollbar-color: #3a3a40 transparent;}
+  body{ background:var(--ink); font-family:'Inter',sans-serif; }
+  .font-display{ font-family:'Newsreader', serif; }
+  .font-ui{ font-family:'Inter Tight', sans-serif; }
+  .font-mono{ font-family:'JetBrains Mono', monospace; }
+
+  .grain::before{
+    content:""; position:fixed; inset:0; pointer-events:none; opacity:.035; z-index:50;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .scanline{ position:absolute; inset:0; pointer-events:none; overflow:hidden; border-radius:inherit; }
+  .scanline::after{
+    content:""; position:absolute; left:0; right:0; height:1.5px; top:-10%;
+    background:linear-gradient(90deg, transparent, var(--gold-soft) 50%, transparent);
+    box-shadow:0 0 12px 1px var(--gold-soft);
+    animation: scan 3.6s linear infinite;
+    opacity:0;
+  }
+  .viewer-frame:hover .scanline::after{ opacity:.85; }
+  @keyframes scan{ 0%{ top:-5%; } 100%{ top:105%; } }
+
+  .match-ring{ transform: rotate(-90deg); transform-origin: 50% 50%; }
+  .match-ring circle{ transition: stroke-dashoffset 1.1s cubic-bezier(.16,1,.3,1); }
+
+  .card-rise{ transition: transform .45s cubic-bezier(.16,1,.3,1), box-shadow .45s ease, border-color .45s ease; }
+
+  ::-webkit-scrollbar{ width:8px; height:8px; }
+  ::-webkit-scrollbar-thumb{ background:#34343a; border-radius:8px; }
+
+  .fade-in{ animation: fadeIn .5s ease both; }
+  @keyframes fadeIn{ from{ opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+
+  .pulse-dot{ animation: pulseDot 2.2s ease-in-out infinite; }
+  @keyframes pulseDot{ 0%,100%{ opacity:1; } 50%{ opacity:.35; } }
+
+  .typing-caret{ animation: blink 1s step-end infinite; }
+  @keyframes blink{ 50%{ opacity:0; } }
+
+  .focus-gold:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
+
+  input[type="range"]{ -webkit-appearance:none; width:100%; height:4px; background:var(--hair); border-radius:2px; outline:none; cursor:pointer; }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:15px; height:15px; border-radius:50%;
+    background:var(--bone); border:3px solid var(--gold); cursor:pointer;
+    box-shadow:0 0 0 4px rgba(201,163,104,0.15); transition:box-shadow .15s ease;
+  }
+  input[type="range"]::-webkit-slider-thumb:hover{ box-shadow:0 0 0 7px rgba(201,163,104,0.2); }
+  input[type="range"]::-moz-range-thumb{ width:15px; height:15px; border-radius:50%; background:var(--bone); border:3px solid var(--gold); cursor:pointer; }
+
+  .typing-dots{ display:flex; gap:4px; padding:3px 1px; }
+  .typing-dots span{ width:5px; height:5px; border-radius:50%; background:var(--bone-dim); animation: dotBounce 1.2s infinite; }
+  .typing-dots span:nth-child(2){ animation-delay:0.15s; }
+  .typing-dots span:nth-child(3){ animation-delay:0.3s; }
+  @keyframes dotBounce{ 0%,60%,100%{ transform:translateY(0); opacity:.5; } 30%{ transform:translateY(-4px); opacity:1; } }
+
+  /* 3D viewer aspect + states */
+  .viewer-frame{ position:relative; width:100%; aspect-ratio:16/10; background:#0A0A0C; border-radius:1rem; overflow:hidden; }
+  .viewer-frame iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
+  .viewer-loading{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.75rem; background:#0A0A0C; transition:opacity .5s ease; }
+
+  @media (prefers-reduced-motion: reduce){
+    .scanline::after, .pulse-dot, .typing-caret, .card-rise, .match-ring circle{ animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body class="grain text-[var(--bone)] min-h-screen selection:bg-[var(--gold)] selection:text-black">
+
+<!-- ============ HEADER ============ -->
+<header class="sticky top-0 z-40 border-b border-[var(--hair)] bg-[var(--ink)]/85 backdrop-blur-xl">
+  <div class="max-w-[1680px] mx-auto px-6 lg:px-8">
+    <div class="h-16 flex items-center justify-between gap-6">
+      <!-- Logo -->
+      <div class="flex items-center gap-2.5 shrink-0">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="9.2" stroke="#C9A368" stroke-width="1.4"/>
+          <circle cx="12" cy="12" r="5.6" stroke="#C9A368" stroke-width="1.2" opacity="0.55"/>
+          <circle cx="12" cy="12" r="2" fill="#C9A368"/>
+        </svg>
+        <span class="font-display text-[19px] tracking-tight">Gaussian</span>
+        <span class="hidden sm:inline-block font-ui text-[10px] uppercase tracking-[0.18em] text-[var(--bone-dim)] border border-[var(--hair)] rounded-full px-2 py-0.5 ml-1">Property Portal</span>
+      </div>
+
+      <!-- Right cluster -->
+      <div class="flex items-center gap-4">
+        <div class="hidden sm:flex items-center gap-1.5 font-ui text-[12px] text-[var(--bone-dim)] border border-[var(--hair)] rounded-full px-3 py-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-[var(--signal)] pulse-dot"></span>
+          Profile <span id="profileCompleteness" class="text-[var(--bone)] font-medium">20%</span> complete
+        </div>
+        <div class="flex items-center gap-2.5 pl-1 pr-3 py-1 rounded-full border border-[var(--hair)]">
+          <span class="w-7 h-7 rounded-full bg-gradient-to-br from-[var(--gold-soft)] to-[var(--gold)] flex items-center justify-center text-[11px] font-ui font-semibold text-black">RM</span>
+          <span class="hidden sm:block font-ui text-[13px] text-[var(--bone-dim)]">Renée Marchetti, REALTOR&reg;</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ PROPERTY STRIP ============ -->
+<section class="max-w-[1680px] mx-auto px-6 lg:px-8 pt-8 pb-2">
+  <div class="flex items-start justify-between gap-6 flex-wrap">
+    <div>
+      <p class="font-ui text-[11px] tracking-[0.22em] uppercase text-[var(--gold)] mb-3" id="propertyEyebrow">Springbank Hill &middot; Calgary, AB &middot; 3D Gaussian Splat Walkthrough</p>
+      <h1 class="font-display text-[clamp(28px,4vw,42px)] leading-[1.08] mb-1" id="propertyH1">108 Springbank Hill Drive SW</h1>
+      <p class="font-ui text-[14px] text-[var(--bone-dim)] max-w-xl">Walk the home before you visit. Tune the panel on the right — your fit score updates live, and your full brief travels with you to Renée.</p>
+    </div>
+    <div class="text-right shrink-0">
+      <p class="font-display text-[30px] leading-none" id="propertyPriceLabel">$1,245,000</p>
+      <p class="font-ui text-[12.5px] text-[var(--bone-dim)] mt-1" id="propertySpecsLabel">5 bd &middot; 4 ba &middot; 3,380 sqft &middot; Detached</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MAIN: AI CHAT + VIEWER + DISCOVERY PANEL ============ -->
+<main class="max-w-[1680px] mx-auto px-6 lg:px-8 pb-24 pt-6">
+  <div class="grid grid-cols-1 lg:grid-cols-6 gap-6 items-start">
+
+    <!-- FAR LEFT: COMPACT AI ASSISTANT CHAT -->
+    <aside class="lg:col-span-1 lg:sticky lg:top-24">
+      <div class="bg-[var(--panel)] border border-[var(--hair)] rounded-2xl flex flex-col h-[560px]">
+        <div class="flex items-center gap-2.5 p-4 border-b border-[var(--hair)]">
+          <span class="w-7 h-7 rounded-lg bg-[var(--gold)] flex items-center justify-center shrink-0">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </span>
+          <div class="flex-1 min-w-0">
+            <p class="font-ui text-[12px] font-medium text-[var(--bone)] leading-tight">AI Assistant</p>
+            <p class="font-ui text-[10px] text-[var(--signal)] flex items-center gap-1 leading-tight"><span class="w-1 h-1 rounded-full bg-[var(--signal)] shrink-0"></span>Live diagnostic</p>
+          </div>
+        </div>
+        <p class="font-ui text-[11px] text-[var(--bone-dim)] px-4 pt-3 pb-1 leading-snug">Pets, must-haves, dealbreakers &mdash; for this home specifically.</p>
+        <div id="chatBody" class="flex-1 overflow-y-auto px-3.5 py-3 space-y-2.5"></div>
+        <div id="chatOptions" class="flex flex-col gap-1.5 px-3.5 pb-2.5"></div>
+        <div class="flex gap-1.5 p-3 border-t border-[var(--hair)]">
+          <input type="text" id="chatInput" placeholder="Type a note&hellip;" class="flex-1 min-w-0 bg-[var(--ink)] border border-[var(--hair)] focus:border-[var(--gold)]/70 rounded-lg px-3 py-2 font-ui text-[12px] text-[var(--bone)] outline-none transition-colors focus-gold">
+          <button id="chatSendBtn" aria-label="Send" class="w-8 h-8 rounded-lg bg-[var(--gold)] flex items-center justify-center hover:bg-[var(--gold-soft)] transition-colors shrink-0 focus-gold">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>
+          </button>
+        </div>
+        <p class="font-ui text-[10px] text-[var(--bone-dim)] text-center pb-3" id="chatProgressLabel">0 of 4 notes captured</p>
+      </div>
+    </aside>
+
+    <!-- CENTER: 3D VIEWER COLUMN -->
+    <div class="lg:col-span-3 space-y-4">
+
+      <div class="viewer-frame group card-rise border border-[var(--hair)]" id="viewerFrame">
+        <div class="viewer-loading" id="viewerLoading">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" class="opacity-70">
+            <path d="M12 2l9 4.9v10.2L12 22l-9-4.9V6.9L12 2Z" stroke="#C9A368" stroke-width="1.3" stroke-linejoin="round"/>
+            <path d="M12 22V12M3 6.9 12 12l9-5.1" stroke="#C9A368" stroke-width="1.3" stroke-linejoin="round"/>
+          </svg>
+          <p class="font-ui text-[12px] text-[var(--bone-dim)]">Loading 3D splat render&hellip;</p>
+        </div>
+        <iframe id="splatEmbed" src="https://lumalabs.ai/embed/REPLACE-WITH-CAPTURE-ID?mode=sparkles&background=%23000000&color=%23ffffff&showTitle=false&loadBg=true&logoPosition=bottom-left&infoPosition=bottom-right&cinematicVideo=undefined&showMenu=false" title="3D Gaussian Splat walkthrough of 108 Springbank Hill Drive SW" allow="autoplay; fullscreen; xr-spatial-tracking" loading="lazy"></iframe>
+        <div class="scanline"></div>
+        <span class="absolute top-3 left-3 flex items-center gap-1.5 bg-black/55 backdrop-blur-md border border-white/15 rounded-full pl-2 pr-3 py-1.5 z-10">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 2l9 4.9v10.2L12 22l-9-4.9V6.9L12 2Z" stroke="#C9A368" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 22V12M3 6.9 12 12l9-5.1" stroke="#C9A368" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          <span class="font-ui text-[10.5px] font-medium text-white tracking-wide">Live 3D Splat &middot; Luma AI</span>
+        </span>
+        <div class="absolute top-3 right-3 bg-black/55 backdrop-blur-md border border-white/15 rounded-full w-12 h-12 flex items-center justify-center z-10" title="Profile fit score">
+          <svg class="match-ring" id="fitRing" width="48" height="48" viewBox="0 0 48 48">
+            <circle cx="24" cy="24" r="19" stroke="#2A2A30" stroke-width="3.5" fill="none"/>
+            <circle cx="24" cy="24" r="19" stroke="var(--gold)" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-dasharray="119.4" stroke-dashoffset="119.4" id="fitRingProgress"/>
+          </svg>
+          <span class="absolute font-mono text-[10px] font-bold text-white" id="fitScoreLabel">&mdash;</span>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between gap-3 flex-wrap">
+        <p class="font-ui text-[11.5px] text-[var(--bone-dim)] flex items-center gap-1.5">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#A8A6A0" stroke-width="1.4"/><path d="M12 8v4l2.5 2.5" stroke="#A8A6A0" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Drag to orbit &middot; scroll to zoom &middot; captured via Luma AI
+        </p>
+        <a href="https://www.realtor.ca" target="_blank" rel="noopener" class="inline-flex items-center gap-2 font-ui text-[12.5px] font-semibold text-[var(--bone)] border border-[var(--hair)] hover:border-[var(--gold)]/60 rounded-full px-4 py-2 transition-colors focus-gold">
+          View Full Listing &amp; Technical Specs on Realtor.ca
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M7 17 17 7M9 7h8v8" stroke="#C9A368" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+
+      <!-- GOLDEN CONVERSION BUTTON -->
+      <button id="goldenCtaBtn" class="w-full font-ui text-[17px] sm:text-[18px] font-bold bg-[var(--gold)] text-black rounded-2xl py-5 hover:bg-[var(--gold-soft)] transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-3 focus-gold shadow-[0_8px_32px_-8px_rgba(201,163,104,0.5)]">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+        Ready to check it out? Request Info!
+      </button>
+
+      <!-- Property facts strip -->
+      <div class="bg-[var(--panel)] border border-[var(--hair)] rounded-2xl p-5 grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div>
+          <p class="font-mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--bone-dim)] mb-1">Beds / Baths</p>
+          <p class="font-display text-[18px]" id="factBeds">5 / 4</p>
+        </div>
+        <div>
+          <p class="font-mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--bone-dim)] mb-1">Square Feet</p>
+          <p class="font-display text-[18px]" id="factSqft">3,380</p>
+        </div>
+        <div>
+          <p class="font-mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--bone-dim)] mb-1">Type</p>
+          <p class="font-display text-[18px]" id="factType">Detached</p>
+        </div>
+        <div>
+          <p class="font-mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--bone-dim)] mb-1">Lot</p>
+          <p class="font-display text-[18px]" id="factLot">0.31 ac</p>
+        </div>
+      </div>
+
+      <p class="font-ui text-[13px] leading-relaxed text-[var(--bone-dim)] px-1" id="propertyDescription">
+        A quietly composed five-bedroom estate set against the escarpment in Springbank Hill, built for a household that values light, distance from the road, and room to spread out. Walk every sightline above before booking a showing &mdash; the agent sees exactly what drew you in.
+      </p>
+
+      <!-- AGENT'S ADDITIONAL LISTINGS -->
+      <div class="pt-2">
+        <p class="font-ui text-[11px] tracking-[0.18em] uppercase text-[var(--gold)] mb-3">Ren&eacute;e's additional listings for this unique workflow</p>
+        <div class="space-y-3" id="additionalListings">
+          <!-- mock listing cards injected by JS -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: CLIENT DISCOVERY & PRE-QUALIFICATION SIDEBAR -->
+    <aside class="lg:col-span-2 lg:sticky lg:top-24 space-y-4">
+
+      <!-- Lifestyle Priorities -->
+      <div class="bg-[var(--panel)] border border-[var(--hair)] rounded-2xl p-6">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-[var(--signal)] pulse-dot"></span>
+          <p class="font-ui text-[11px] tracking-[0.18em] uppercase text-[var(--gold)]">Diagnostic 01</p>
+        </div>
+        <h3 class="font-display text-[20px] mb-1">Lifestyle Priorities</h3>
+        <p class="font-ui text-[12.5px] text-[var(--bone-dim)] mb-5">Weight what matters &mdash; this home's fit score updates live.</p>
+
+        <div class="space-y-4" id="slidersWrap">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-ui text-[13px] text-[var(--bone-dim)] flex items-center gap-1.5">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M3 12h4l3-9 4 18 3-9h4" stroke="#C9A368" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Commute
+              </span>
+              <span class="font-mono text-[11.5px] text-[var(--gold)] font-medium" id="val-commute">70%</span>
+            </div>
+            <input type="range" min="0" max="100" value="70" id="slider-commute">
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-ui text-[13px] text-[var(--bone-dim)] flex items-center gap-1.5">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="9" width="18" height="11" rx="1" stroke="#C9A368" stroke-width="1.6"/><path d="M9 9V5a3 3 0 0 1 6 0v4" stroke="#C9A368" stroke-width="1.6"/></svg>
+                Space &amp; Layout
+              </span>
+              <span class="font-mono text-[11.5px] text-[var(--gold)] font-medium" id="val-space">55%</span>
+            </div>
+            <input type="range" min="0" max="100" value="55" id="slider-space">
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-ui text-[13px] text-[var(--bone-dim)] flex items-center gap-1.5">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 2 2 9l10 13L22 9z" stroke="#C9A368" stroke-width="1.6" stroke-linejoin="round"/></svg>
+                School District
+              </span>
+              <span class="font-mono text-[11.5px] text-[var(--gold)] font-medium" id="val-school">30%</span>
+            </div>
+            <input type="range" min="0" max="100" value="30" id="slider-school">
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-ui text-[13px] text-[var(--bone-dim)] flex items-center gap-1.5">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#C9A368" stroke-width="1.6"/><path d="M12 7v5l3 3" stroke="#C9A368" stroke-width="1.6" stroke-linecap="round"/></svg>
+                Walkability
+              </span>
+              <span class="font-mono text-[11.5px] text-[var(--gold)] font-medium" id="val-walk">45%</span>
+            </div>
+            <input type="range" min="0" max="100" value="45" id="slider-walk">
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-ui text-[13px] text-[var(--bone-dim)] flex items-center gap-1.5">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M3 21V8l9-5 9 5v13" stroke="#C9A368" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 21v-7h6v7" stroke="#C9A368" stroke-width="1.6"/></svg>
+                Privacy &amp; Yard
+              </span>
+              <span class="font-mono text-[11.5px] text-[var(--gold)] font-medium" id="val-privacy">60%</span>
+            </div>
+            <input type="range" min="0" max="100" value="60" id="slider-privacy">
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-1.5 mt-5 pt-5 border-t border-[var(--hair)]" id="commutePresets">
+          <span class="font-ui text-[11px] text-[var(--bone-dim)] mr-1 pt-1.5">Anchor:</span>
+          <button class="preset-chip font-ui text-[11px] text-[var(--bone-dim)] border border-[var(--hair)] rounded-full px-2.5 py-1.5 hover:border-[var(--gold)]/50 hover:text-[var(--bone)] transition-colors focus-gold" data-target="Downtown Core">Downtown Core</button>
+          <button class="preset-chip font-ui text-[11px] text-[var(--bone-dim)] border border-[var(--hair)] rounded-full px-2.5 py-1.5 hover:border-[var(--gold)]/50 hover:text-[var(--bone)] transition-colors focus-gold" data-target="U of C">U of C</button>
+          <button class="preset-chip font-ui text-[11px] text-[var(--bone-dim)] border border-[var(--hair)] rounded-full px-2.5 py-1.5 hover:border-[var(--gold)]/50 hover:text-[var(--bone)] transition-colors focus-gold" data-target="Foothills Medical">Foothills Medical</button>
+          <button class="preset-chip font-ui text-[11px] text-[var(--bone-dim)] border border-[var(--hair)] rounded-full px-2.5 py-1.5 hover:border-[var(--gold)]/50 hover:text-[var(--bone)] transition-colors focus-gold" data-target="Quarry Park">Quarry Park</button>
+          <button class="preset-chip font-ui text-[11px] text-[var(--bone-dim)] border border-[var(--hair)] rounded-full px-2.5 py-1.5 hover:border-[var(--gold)]/50 hover:text-[var(--bone)] transition-colors focus-gold" data-target="YYC Airport">YYC Airport</button>
+        </div>
+      </div>
+
+      <!-- All-In Budget Calculator -->
+      <div class="bg-[var(--panel)] border border-[var(--hair)] rounded-2xl p-6">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-[var(--signal)] pulse-dot"></span>
+          <p class="font-ui text-[11px] tracking-[0.18em] uppercase text-[var(--gold)]">Diagnostic 02</p>
+        </div>
+        <h3 class="font-display text-[20px] mb-1">All-In Budget Calculator</h3>
+        <p class="font-ui text-[12.5px] text-[var(--bone-dim)] mb-5">Your true monthly carrying cost on this specific home.</p>
+
+        <div class="grid grid-cols-2 gap-2.5 mb-4">
+          <div>
+            <label class="font-mono text-[10px] uppercase tracking-wide text-[var(--bone-dim)] block mb-1.5">Purchase price</label>
+            <input type="text" id="purchasePrice" value="1245000" inputmode="numeric" class="w-full bg-[var(--ink)] border border-[var(--hair)] focus:border-[var(--gold)]/70 rounded-lg px-3 py-2 font-mono text-[12.5px] text-[var(--bone)] outline-none transition-colors focus-gold">
+          </div>
+          <div>
+            <label class="font-mono text-[10px] uppercase tracking-wide text-[var(--bone-dim)] block mb-1.5">Down payment %</label>
+            <input type="text" id="downPayment" value="20" inputmode="numeric" class="w-full bg-[var(--ink)] border border-[var(--hair)] focus:border-[var(--gold)]/70 rounded-lg px-3 py-2 font-mono text-[12.5px] text-[var(--bone)] outline-none transition-colors focus-gold">
+          </div>
+          <div>
+            <label class="font-mono text-[10px] uppercase tracking-wide text-[var(--bone-dim)] block mb-1.5">Rate %</label>
+            <input type="text" id="rate" value="4.9" inputmode="decimal" class="w-full bg-[var(--ink)] border border-[var(--hair)] focus:border-[var(--gold)]/70 rounded-lg px-3 py-2 font-mono text-[12.5px] text-[var(--bone)] outline-none transition-colors focus-gold">
+          </div>
+          <div>
+            <label class="font-mono text-[10px] uppercase tracking-wide text-[var(--bone-dim)] block mb-1.5">Condo fees / mo</label>
+            <input type="text" id="condoFees" value="0" inputmode="numeric" class="w-full bg-[var(--ink)] border border-[var(--hair)] focus:border-[var(--gold)]/70 rounded-lg px-3 py-2 font-mono text-[12.5px] text-[var(--bone)] outline-none transition-colors focus-gold">
+          </div>
+        </div>
+
+        <div class="bg-[var(--panel-soft)] border border-[var(--hair)] rounded-xl p-4">
+          <div class="flex items-baseline gap-1.5">
+            <span class="font-display text-[26px] text-[var(--bone)]" id="budgetTotal">$0</span>
+            <span class="font-mono text-[11px] text-[var(--bone-dim)]">/ month all-in</span>
+          </div>
+          <p class="font-ui text-[11px] text-[var(--bone-dim)] mb-3">Mortgage &middot; property tax &middot; insurance estimate</p>
+
+          <div class="space-y-1.5 font-ui text-[12px]">
+            <div class="flex items-center justify-between"><span class="text-[var(--bone-dim)] flex items-center gap-1.5"><span class="w-2 h-2 rounded-sm" style="background:#C9A368;"></span>Mortgage (P&amp;I)</span><span class="font-mono text-[var(--bone)]" id="bdMortgage">$0</span></div>
+            <div class="flex items-center justify-between"><span class="text-[var(--bone-dim)] flex items-center gap-1.5"><span class="w-2 h-2 rounded-sm" style="background:#7FE3B4;"></span>Property Tax</span><span class="font-mono text-[var(--bone)]" id="bdTax">$0</span></div>
+            <div class="flex items-center justify-between"><span class="text-[var(--bone-dim)] flex items-center gap-1.5"><span class="w-2 h-2 rounded-sm" style="background:#C97B4A;"></span>Insurance (est.)</span><span class="font-mono text-[var(--bone)]" id="bdInsurance">$0</span></div>
+            <div class="flex items-center justify-between"><span class="text-[var(--bone-dim)] flex items-center gap-1.5"><span class="w-2 h-2 rounded-sm" style="background:#5A5A62;"></span>Condo Fees</span><span class="font-mono text-[var(--bone)]" id="bdCondo">$0</span></div>
+          </div>
+
+          <div class="w-full h-1.5 bg-[var(--hair)] rounded-full overflow-hidden flex mt-3.5">
+            <div id="bdBarMortgage" style="background:#C9A368;"></div>
+            <div id="bdBarTax" style="background:#7FE3B4;"></div>
+            <div id="bdBarInsurance" style="background:#C97B4A;"></div>
+            <div id="bdBarCondo" style="background:#5A5A62;"></div>
+          </div>
+
+          <p class="font-ui text-[11px] mt-3" id="budgetFitNote"></p>
+        </div>
+      </div>
+
+      <!-- Synthesized Brief -->
+      <div class="bg-[var(--panel)] border border-[var(--hair)] rounded-2xl p-6">
+        <p class="font-ui text-[11px] tracking-[0.18em] uppercase text-[var(--gold)] mb-3">Synthesized for Ren&eacute;e</p>
+        <div class="bg-[var(--ink)] border border-[var(--hair)] rounded-xl p-4 font-mono text-[11.5px] leading-relaxed text-[var(--bone-dim)] max-h-[200px] overflow-y-auto whitespace-pre-wrap" id="briefBox">
+          Building client brief&hellip;
+        </div>
+        <p class="font-ui text-[11px] text-[var(--bone-dim)] text-center mt-3">This brief updates live and is sent automatically when you tap the gold "Request Info" button above the 3D viewer.</p>
+      </div>
+
+    </aside>
+  </div>
+</main>
+
+<!-- ============ REQUEST INFO MODAL (GoHighLevel) ============ -->
+<div id="requestModal" class="fixed inset-0 z-50 hidden items-center justify-center p-6 bg-black/70 backdrop-blur-sm">
+  <div class="bg-[var(--panel)] border border-[var(--hair)] rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto relative fade-in">
+    <div class="flex items-start justify-between p-6 pb-4 border-b border-[var(--hair)]">
+      <div>
+        <h3 class="font-display text-[20px] mb-1" id="requestModalTitle">Request Info &mdash; 108 Springbank Hill Drive SW</h3>
+        <p class="font-ui text-[12.5px] text-[var(--bone-dim)]">This brief is bundled automatically &mdash; Ren&eacute;e sees it the moment you submit.</p>
+      </div>
+      <button id="closeRequestModal" aria-label="Close" class="w-8 h-8 rounded-full border border-[var(--hair)] flex items-center justify-center hover:border-[var(--gold)]/60 transition-colors focus-gold shrink-0">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#F4F2EC" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="p-6">
+      <div class="bg-[var(--ink)] border border-[var(--gold)]/30 rounded-xl p-4 mb-5">
+        <p class="font-mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--gold)] mb-2">client_intent_summary &rarr;</p>
+        <p id="summaryPreviewText" class="font-mono text-[11px] leading-relaxed text-[var(--bone-dim)] max-h-[150px] overflow-y-auto whitespace-pre-wrap">Building summary&hellip;</p>
+      </div>
+
+      <iframe
+        src="https://api.leadconnectorhq.com/widget/form/I0W15bpSf2WEndcCGuQ2"
+        style="width:100%;height:834px;border:none;border-radius:8px"
+        id="inline-I0W15bpSf2WEndcCGuQ2"
+        data-layout="{'id':'INLINE'}"
+        data-trigger-type="alwaysShow"
+        data-trigger-value=""
+        data-activation-type="alwaysActivated"
+        data-activation-value=""
+        data-deactivation-type="neverDeactivate"
+        data-deactivation-value=""
+        data-form-name="Form 1"
+        data-height="834"
+        data-layout-iframe-id="inline-I0W15bpSf2WEndcCGuQ2"
+        data-form-id="I0W15bpSf2WEndcCGuQ2"
+        title="Form 1"
+      ></iframe>
+    </div>
+  </div>
+</div>
+<script src="https://link.msgsndr.com/js/form_embed.js"></script>
+
+<!-- ============ TOAST ============ -->
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[var(--panel)] border border-[var(--gold)] text-[var(--bone)] px-5 py-3.5 rounded-xl font-ui text-[13px] font-medium flex items-center gap-2.5 z-[60] opacity-0 pointer-events-none transition-all duration-300 shadow-2xl">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C9A368" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+  <span id="toastText">Profile sent to agent.</span>
+</div>
+
+
+<script>
+(function(){
+
+  /* =========================================================
+     THE PROPERTY (and the agent's other listings)
+     This single-property portal is generated from one agent
+     intake submission (GoHighLevel form -> Gaussian build pipeline).
+     In production these objects are populated server-side; here
+     they're hardcoded as representative listings for this workflow.
+     ========================================================= */
+  const listings = [
+    {
+      address:'108 Springbank Hill Drive SW',
+      city:'Calgary, AB',
+      price:1245000,
+      beds:5, baths:4, sqft:3380, lot:'0.31 ac', type:'Detached',
+      eyebrow:'Springbank Hill &middot; Calgary, AB &middot; 3D Gaussian Splat Walkthrough',
+      description:"A quietly composed five-bedroom estate set against the escarpment in Springbank Hill, built for a household that values light, distance from the road, and room to spread out. Walk every sightline above before booking a showing &mdash; the agent sees exactly what drew you in.",
+      embedUrl:'https://lumalabs.ai/embed/REPLACE-WITH-CAPTURE-ID?mode=sparkles&background=%23000000&color=%23ffffff&showTitle=false&loadBg=true&logoPosition=bottom-left&infoPosition=bottom-right&cinematicVideo=undefined&showMenu=false',
+      thumb:'linear-gradient(135deg,#2a2a30,#16161a)',
+      // Attributes this specific home offers, scored 0-100, used to
+      // compute the live "fit score" against the client's weighted priorities.
+      attrs:{ commute:48, space:95, school:90, walk:30, privacy:88 }
+    },
+    {
+      address:'214 Discovery Ridge Close SW',
+      city:'Discovery Ridge, Calgary',
+      price:1150000,
+      beds:4, baths:3, sqft:2980, lot:'0.24 ac', type:'Detached',
+      eyebrow:'Discovery Ridge &middot; Calgary, AB &middot; 3D Gaussian Splat Walkthrough',
+      description:"A walk-out bungalow backing onto the ravine, with a wall of west-facing glass and a layout built around single-level living. Quieter street, shorter commute to the mountains than to downtown.",
+      embedUrl:'https://lumalabs.ai/embed/REPLACE-WITH-CAPTURE-ID-2?mode=sparkles&background=%23000000&color=%23ffffff&showTitle=false&loadBg=true&logoPosition=bottom-left&infoPosition=bottom-right&cinematicVideo=undefined&showMenu=false',
+      thumb:'linear-gradient(135deg,#2f261c,#16161a)',
+      attrs:{ commute:52, space:82, school:80, walk:34, privacy:85 }
+    },
+    {
+      address:'77 Cranston Ridge SE',
+      city:'Cranston, Calgary',
+      price:746000,
+      beds:3, baths:3, sqft:2150, lot:'0.16 ac', type:'Detached',
+      eyebrow:'Cranston &middot; Calgary, AB &middot; 3D Gaussian Splat Walkthrough',
+      description:"A move-in ready family home in one of the city's most established SE communities, close to schools, the river pathway system, and quick highway access south.",
+      embedUrl:'https://lumalabs.ai/embed/REPLACE-WITH-CAPTURE-ID-3?mode=sparkles&background=%23000000&color=%23ffffff&showTitle=false&loadBg=true&logoPosition=bottom-left&infoPosition=bottom-right&cinematicVideo=undefined&showMenu=false',
+      thumb:'linear-gradient(135deg,#1c2a24,#16161a)',
+      attrs:{ commute:60, space:64, school:62, walk:48, privacy:66 }
+    },
+    {
+      address:'1602 17 Ave SW, Unit 9',
+      city:'Beltline, Calgary',
+      price:412000,
+      beds:1, baths:1, sqft:680, lot:'N/A', type:'Apartment',
+      eyebrow:'Beltline &middot; Calgary, AB &middot; 3D Gaussian Splat Walkthrough',
+      description:"A top-floor corner unit two blocks off 17th Ave, built for someone who wants to walk to everything and never think about a commute again.",
+      embedUrl:'https://lumalabs.ai/embed/REPLACE-WITH-CAPTURE-ID-4?mode=sparkles&background=%23000000&color=%23ffffff&showTitle=false&loadBg=true&logoPosition=bottom-left&infoPosition=bottom-right&cinematicVideo=undefined&showMenu=false',
+      thumb:'linear-gradient(135deg,#241c2a,#16161a)',
+      attrs:{ commute:97, space:35, school:15, walk:98, privacy:20 }
+    }
+  ];
+
+  let activeIndex = 0;
+  function property(){ return listings[activeIndex]; }
+  const agentName = 'Renée Marchetti';
+
+  /* =========================================================
+     GLOBAL CLIENT PROFILE STATE
+     ========================================================= */
+  const clientProfile = {
+    lifestyle: { commute:70, space:55, school:30, walk:45, privacy:60 },
+    commuteTarget: null,
+    budget: { price:1245000, downPct:20, rate:4.9, condo:0, allIn:0 },
+    notes: [],
+    chatAnswers: {}
+  };
+
+  function fmtMoney(n){ return '$' + Math.round(n).toLocaleString('en-US'); }
+
+  /* =========================================================
+     FIT SCORE — this client's weighted priorities vs THIS home
+     ========================================================= */
+  function computeFit(){
+    const w = clientProfile.lifestyle;
+    const p = property();
+    const totalWeight = w.commute + w.space + w.school + w.walk + w.privacy || 1;
+    const score =
+      (p.attrs.commute * w.commute) +
+      (p.attrs.space   * w.space) +
+      (p.attrs.school  * w.school) +
+      (p.attrs.walk    * w.walk) +
+      (p.attrs.privacy * w.privacy);
+    return Math.round(score / totalWeight);
+  }
+
+  function topFitReason(){
+    const w = clientProfile.lifestyle;
+    const p = property();
+    const dims = [
+      { label:'commute', weight:w.commute, score:p.attrs.commute },
+      { label:'space', weight:w.space, score:p.attrs.space },
+      { label:'schools', weight:w.school, score:p.attrs.school },
+      { label:'walkability', weight:w.walk, score:p.attrs.walk },
+      { label:'privacy', weight:w.privacy, score:p.attrs.privacy }
+    ];
+    dims.sort((a,b) => (b.weight*b.score) - (a.weight*a.score));
+    const best = dims[0];
+    const worst = dims[dims.length-1];
+    const overBudget = p.price > clientProfile.budget.price * 1.05;
+    if(overBudget){
+      return { text:`Strong on ${best.label}, but ~${fmtMoney(p.price - clientProfile.budget.price)} over your target budget`, warn:true };
+    }
+    if(best.score >= 75){
+      return { text:`Best aligned on ${best.label} — matches your top priority`, warn:false };
+    }
+    return { text:`Moderate fit. ${worst.label} scores lowest against your weighting`, warn:true };
+  }
+
+  function updateFitRing(){
+    const fit = computeFit();
+    const r = 19, c = 2*Math.PI*r;
+    const offset = c - (fit/100)*c;
+    const color = fit >= 90 ? 'var(--signal)' : fit >= 75 ? 'var(--gold)' : 'var(--rust)';
+    const ring = document.getElementById('fitRingProgress');
+    ring.style.stroke = color;
+    ring.setAttribute('stroke-dasharray', c.toFixed(1));
+    ring.setAttribute('stroke-dashoffset', offset.toFixed(1));
+    document.getElementById('fitScoreLabel').textContent = fit + '%';
+
+    const note = topFitReason();
+    const fitNoteEl = document.getElementById('budgetFitNote');
+    fitNoteEl.textContent = note.text;
+    fitNoteEl.className = 'font-ui text-[11px] mt-3 ' + (note.warn ? 'text-[var(--rust)]' : 'text-[var(--signal)]');
+  }
+
+  /* =========================================================
+     3D VIEWER — hide loading state once iframe reports load
+     ========================================================= */
+  const splatEmbed = document.getElementById('splatEmbed');
+  const viewerLoading = document.getElementById('viewerLoading');
+
+  function armViewerLoadingState(){
+    viewerLoading.style.display = 'flex';
+    viewerLoading.style.opacity = '1';
+  }
+
+  splatEmbed.addEventListener('load', function(){
+    viewerLoading.style.opacity = '0';
+    setTimeout(() => { viewerLoading.style.display = 'none'; }, 500);
+  });
+  // Fallback: if the embed is slow or blocked, don't leave the loader forever.
+  function arm6sFallback(){
+    setTimeout(() => {
+      if(viewerLoading.style.display !== 'none'){
+        viewerLoading.style.opacity = '0';
+        setTimeout(() => { viewerLoading.style.display = 'none'; }, 500);
+      }
+    }, 6000);
+  }
+  arm6sFallback();
+
+  /* =========================================================
+     RENDER ACTIVE PROPERTY DETAILS (header, facts strip, copy)
+     ========================================================= */
+  function fmtSpecs(p){
+    return `${p.beds} bd &middot; ${p.baths} ba &middot; ${p.sqft.toLocaleString()} sqft &middot; ${p.type}`;
+  }
+
+  function renderActiveProperty(){
+    const p = property();
+    document.getElementById('propertyEyebrow').innerHTML = p.eyebrow;
+    document.getElementById('propertyH1').textContent = p.address;
+    document.getElementById('propertyPriceLabel').textContent = fmtMoney(p.price);
+    document.getElementById('propertySpecsLabel').innerHTML = fmtSpecs(p);
+    document.getElementById('factBeds').textContent = `${p.beds} / ${p.baths}`;
+    document.getElementById('factSqft').textContent = p.sqft.toLocaleString();
+    document.getElementById('factType').textContent = p.type;
+    document.getElementById('factLot').textContent = p.lot;
+    document.getElementById('propertyDescription').innerHTML = p.description;
+    document.title = `${p.address} — Gaussian Property Portal`;
+
+    // swap the 3D viewer
+    armViewerLoadingState();
+    splatEmbed.src = p.embedUrl;
+    arm6sFallback();
+  }
+
+  /* =========================================================
+     AGENT'S ADDITIONAL LISTINGS — mock cards + "IMMEDIATE VIEW 3D"
+     ========================================================= */
+  function renderAdditionalListings(){
+    const wrap = document.getElementById('additionalListings');
+    wrap.innerHTML = '';
+    listings.forEach((p, idx) => {
+      if(idx === activeIndex) return; // don't show the currently-active listing in its own list
+      const card = document.createElement('div');
+      card.className = 'flex items-center gap-4 bg-[var(--panel)] border border-[var(--hair)] rounded-2xl p-4 card-rise';
+      card.innerHTML = `
+        <div class="w-24 h-20 sm:w-28 sm:h-24 rounded-xl shrink-0 relative overflow-hidden border border-[var(--hair)]" style="background:${p.thumb}">
+          <span class="absolute top-1.5 left-1.5 flex items-center gap-1 bg-black/55 backdrop-blur-md rounded-full px-1.5 py-0.5">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M12 2l9 4.9v10.2L12 22l-9-4.9V6.9L12 2Z" stroke="#C9A368" stroke-width="2"/></svg>
+            <span class="font-mono text-[7.5px] text-white">3D</span>
+          </span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-display text-[16px] leading-tight">${fmtMoney(p.price)}</p>
+          <p class="font-ui text-[11.5px] text-[var(--bone-dim)] truncate">${p.address}</p>
+          <p class="font-mono text-[10px] text-[var(--bone-dim)] mt-0.5">${p.beds} bed, ${p.baths} bath &middot; ${p.sqft.toLocaleString()} sqft</p>
+        </div>
+        <button class="view-3d-btn shrink-0 font-ui text-[11px] font-bold bg-[var(--gold)] text-black rounded-lg px-3.5 py-2.5 hover:bg-[var(--gold-soft)] transition-colors focus-gold whitespace-nowrap" data-index="${idx}">
+          IMMEDIATE VIEW 3D
+        </button>
+      `;
+      wrap.appendChild(card);
+    });
+  }
+
+  document.getElementById('additionalListings').addEventListener('click', function(e){
+    const btn = e.target.closest('.view-3d-btn');
+    if(!btn) return;
+    activeIndex = parseInt(btn.dataset.index, 10);
+    renderActiveProperty();
+    renderAdditionalListings();
+    updateFitRing();
+    updateBrief();
+    showToast(`Now viewing ${property().address}`);
+    document.getElementById('viewerFrame').scrollIntoView({ behavior:'smooth', block:'center' });
+  });
+
+  /* =========================================================
+     LIFESTYLE SLIDERS
+     ========================================================= */
+  ['commute','space','school','walk','privacy'].forEach(key => {
+    const el = document.getElementById('slider-' + key);
+    const val = document.getElementById('val-' + key);
+    el.addEventListener('input', function(){
+      clientProfile.lifestyle[key] = parseInt(this.value, 10);
+      val.textContent = this.value + '%';
+      updateFitRing();
+      updateBrief();
+      updateCompleteness();
+    });
+  });
+
+  document.getElementById('commutePresets').addEventListener('click', function(e){
+    const chip = e.target.closest('.preset-chip');
+    if(!chip) return;
+    document.querySelectorAll('#commutePresets .preset-chip').forEach(c => {
+      c.classList.remove('border-[var(--gold)]','text-[var(--bone)]');
+      c.style.background = '';
+    });
+    chip.classList.add('border-[var(--gold)]','text-[var(--bone)]');
+    chip.style.background = 'rgba(201,163,104,0.12)';
+    clientProfile.commuteTarget = chip.dataset.target;
+    showToast(`Commute anchor set to ${chip.dataset.target}`);
+    updateBrief();
+    updateCompleteness();
+  });
+
+  /* =========================================================
+     ALL-IN BUDGET CALCULATOR
+     ========================================================= */
+  const priceInput = document.getElementById('purchasePrice');
+  const downInput = document.getElementById('downPayment');
+  const rateInput = document.getElementById('rate');
+  const condoInput = document.getElementById('condoFees');
+
+  function recalcBudget(){
+    const price = parseFloat(priceInput.value.replace(/[^0-9.]/g,'')) || 0;
+    const downPct = parseFloat(downInput.value.replace(/[^0-9.]/g,'')) || 0;
+    const rate = parseFloat(rateInput.value.replace(/[^0-9.]/g,'')) || 0;
+    const condo = parseFloat(condoInput.value.replace(/[^0-9.]/g,'')) || 0;
+
+    const loanAmt = price * (1 - downPct/100);
+    const monthlyRate = (rate/100) / 12;
+    const n = 25 * 12;
+    let mortgage = 0;
+    if(monthlyRate > 0){
+      mortgage = loanAmt * (monthlyRate * Math.pow(1+monthlyRate, n)) / (Math.pow(1+monthlyRate, n) - 1);
+    } else {
+      mortgage = loanAmt / n;
+    }
+    const tax = (price * 0.005) / 12;
+    const insurance = Math.max(80, price * 0.00018);
+    const allIn = mortgage + tax + insurance + condo;
+
+    clientProfile.budget = { price, downPct, rate, condo, allIn };
+
+    document.getElementById('budgetTotal').textContent = fmtMoney(allIn);
+    document.getElementById('bdMortgage').textContent = fmtMoney(mortgage);
+    document.getElementById('bdTax').textContent = fmtMoney(tax);
+    document.getElementById('bdInsurance').textContent = fmtMoney(insurance);
+    document.getElementById('bdCondo').textContent = fmtMoney(condo);
+
+    const total = mortgage + tax + insurance + condo || 1;
+    document.getElementById('bdBarMortgage').style.width = (mortgage/total*100) + '%';
+    document.getElementById('bdBarTax').style.width = (tax/total*100) + '%';
+    document.getElementById('bdBarInsurance').style.width = (insurance/total*100) + '%';
+    document.getElementById('bdBarCondo').style.width = (condo/total*100) + '%';
+
+    updateFitRing();
+    updateBrief();
+    updateCompleteness();
+  }
+  [priceInput, downInput, rateInput, condoInput].forEach(input => input.addEventListener('input', recalcBudget));
+
+  /* =========================================================
+     AI CLIENT ASSISTANT CHATBOT (simulated, always-on inline panel)
+     ========================================================= */
+  const chatBody = document.getElementById('chatBody');
+  const chatOptions = document.getElementById('chatOptions');
+  const chatInput = document.getElementById('chatInput');
+
+  function buildChatScript(){
+    const p = property();
+    return [
+      { bot:`Hi! I'm putting together your brief for Renée on ${p.address}. First — any pets I should note for yard size or flooring considerations?`, key:'pets', options:['Two large dogs', 'One cat', 'No pets', 'Other (type below)'] },
+      { bot:"Got it. Any non-negotiable must-haves for this home? Things you won't compromise on.", key:'mustHaves', options:['Home office space', 'Attached garage', 'Move-in ready', 'Open-concept kitchen'] },
+      { bot:"And dealbreakers — anything that would take this property off the list immediately?", key:'dealbreakers', options:['Busy main road', 'No yard', 'Needs renovation', 'Steep driveway'] },
+      { bot:"Last one — what's your ideal move-in timeline?", key:'timeline', options:['Within 30 days', '1–3 months', '3–6 months', 'Just exploring'] },
+      { bot:"Perfect — that gives Renée a complete picture for this property. Keep chatting any time to add more notes, or use the gold button above the viewer to send your profile.", key:'done', options:[] }
+    ];
+  }
+  let chatScript = buildChatScript();
+  let chatStep = 0;
+
+  function appendMsg(role, text){
+    const div = document.createElement('div');
+    if(role === 'bot'){
+      div.className = 'flex gap-2.5 max-w-[88%]';
+      div.innerHTML = `<div class="bg-[var(--panel-soft)] border border-[var(--hair)] rounded-2xl rounded-bl-sm px-3.5 py-2.5 font-ui text-[13px] leading-relaxed text-[var(--bone-dim)]">${text}</div>`;
+    } else {
+      div.className = 'flex gap-2.5 max-w-[88%] ml-auto flex-row-reverse';
+      div.innerHTML = `<div class="bg-[var(--gold)] text-black rounded-2xl rounded-br-sm px-3.5 py-2.5 font-ui text-[13px] font-medium leading-relaxed">${text}</div>`;
+    }
+    chatBody.appendChild(div);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    return div;
+  }
+
+  function showTyping(){
+    const div = document.createElement('div');
+    div.className = 'flex gap-2.5 max-w-[88%]';
+    div.innerHTML = `<div class="bg-[var(--panel-soft)] border border-[var(--hair)] rounded-2xl rounded-bl-sm px-3.5 py-3"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+    chatBody.appendChild(div);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    return div;
+  }
+
+  function renderChatOptions(){
+    const step = chatScript[chatStep];
+    chatOptions.innerHTML = '';
+    if(!step || step.options.length === 0) return;
+    step.options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'w-full text-left font-ui text-[11.5px] px-3 py-2 rounded-lg bg-[var(--panel-soft)] border border-[var(--hair)] text-[var(--bone-dim)] hover:border-[var(--gold)]/60 hover:text-[var(--bone)] transition-colors focus-gold';
+      btn.textContent = opt;
+      btn.addEventListener('click', () => handleChatAnswer(opt));
+      chatOptions.appendChild(btn);
+    });
+  }
+
+  function advanceChat(){
+    const step = chatScript[chatStep];
+    if(!step) return;
+    const typing = showTyping();
+    setTimeout(() => {
+      typing.remove();
+      appendMsg('bot', step.bot);
+      renderChatOptions();
+    }, 650);
+  }
+
+  function handleChatAnswer(answer){
+    const step = chatScript[chatStep];
+    appendMsg('user', answer);
+    chatOptions.innerHTML = '';
+
+    if(step.key !== 'done'){
+      clientProfile.chatAnswers[step.key] = answer;
+      if(answer.toLowerCase().indexOf('other') === -1){
+        clientProfile.notes.push(answer);
+      }
+    }
+    chatStep++;
+    updateChatProgressLabel();
+    updateBrief();
+    updateCompleteness();
+
+    if(chatStep < chatScript.length){ advanceChat(); }
+  }
+
+  function updateChatProgressLabel(){
+    const captured = Math.min(chatStep, chatScript.length - 1);
+    document.getElementById('chatProgressLabel').textContent = `${captured} of ${chatScript.length - 1} notes captured`;
+  }
+
+  document.getElementById('chatSendBtn').addEventListener('click', sendFreeText);
+  chatInput.addEventListener('keydown', function(e){ if(e.key === 'Enter') sendFreeText(); });
+
+  function sendFreeText(){
+    const text = chatInput.value.trim();
+    if(!text) return;
+    appendMsg('user', text);
+    clientProfile.notes.push(text);
+    chatInput.value = '';
+    updateBrief();
+    updateCompleteness();
+
+    const typing = showTyping();
+    setTimeout(() => {
+      typing.remove();
+      appendMsg('bot', "Noted — added that to your brief for Renée. " + (chatStep < chatScript.length ? "Anything else, or want to continue?" : "Your profile is looking solid."));
+      renderChatOptions();
+    }, 600);
+  }
+
+  /* =========================================================
+     SYNTHESIZED CLIENT BRIEF (feeds GHL client_intent_summary)
+     ========================================================= */
+  function topPriorities(){
+    const w = clientProfile.lifestyle;
+    const arr = [
+      { label:'Commute', v:w.commute }, { label:'Space', v:w.space },
+      { label:'Schools', v:w.school }, { label:'Walkability', v:w.walk },
+      { label:'Privacy/Yard', v:w.privacy }
+    ];
+    arr.sort((a,b) => b.v - a.v);
+    const total = arr.reduce((s,x) => s + x.v, 0) || 1;
+    return arr.slice(0,2).map(x => `${Math.round(x.v/total*100)}% ${x.label}`).join(', ');
+  }
+
+  function buildBriefText(){
+    const b = clientProfile.budget;
+    const fit = computeFit();
+    const p = property();
+    const lines = [];
+    lines.push(`Property of Interest: ${p.address}, ${p.city} — ${fit}% profile fit.`);
+    lines.push(`Client Priorities: ${topPriorities()}.`);
+    if(clientProfile.commuteTarget){ lines.push(`Commute anchor: ${clientProfile.commuteTarget}.`); }
+    lines.push(`Max Budget: ${fmtMoney(b.allIn)}/mo all-in (≈${fmtMoney(b.price)} purchase, ${b.downPct}% down, ${b.rate}% rate).`);
+    if(clientProfile.notes.length){ lines.push(`Notes: ${clientProfile.notes.join('; ')}.`); }
+    return lines.join(' ');
+  }
+
+  function updateBrief(){
+    document.getElementById('briefBox').textContent = buildBriefText();
+  }
+
+  function updateCompleteness(){
+    let score = 20;
+    const w = clientProfile.lifestyle;
+    const slidersMoved = Object.values(w).filter(v => v !== 70 && v !== 55 && v !== 30 && v !== 45 && v !== 60).length;
+    score += Math.min(20, slidersMoved * 4);
+    if(clientProfile.commuteTarget) score += 10;
+    if(clientProfile.budget.price) score += 15;
+    score += Math.min(35, clientProfile.notes.length * 9);
+    score = Math.min(100, score);
+    document.getElementById('profileCompleteness').textContent = score + '%';
+  }
+
+  /* =========================================================
+     REQUEST INFO MODAL (GoHighLevel) + SEND PROFILE
+     ========================================================= */
+  const requestModal = document.getElementById('requestModal');
+
+  function openRequestModal(){
+    const previewText = document.getElementById('summaryPreviewText');
+    const titleEl = document.getElementById('requestModalTitle');
+    const summary = buildBriefText();
+    titleEl.textContent = `Request Info — ${property().address}`;
+    previewText.textContent = summary;
+    pushSummaryToGHLForm(summary);
+    requestModal.classList.remove('hidden');
+    requestModal.classList.add('flex');
+  }
+
+  document.getElementById('closeRequestModal').addEventListener('click', function(){
+    requestModal.classList.add('hidden'); requestModal.classList.remove('flex');
+  });
+  requestModal.addEventListener('click', function(e){
+    if(e.target === requestModal){ requestModal.classList.add('hidden'); requestModal.classList.remove('flex'); }
+  });
+
+  /*
+    Pushes the synthesized brief into the GoHighLevel embedded form as a
+    hidden/custom field value. GHL inline forms render in an iframe from
+    a separate origin, so direct DOM access is blocked by the browser.
+    We do two best-effort things:
+    1) Append field values as URL query params on the iframe src
+       (?property_of_interest=...&client_intent_summary=...)
+    2) Attempt a postMessage handshake in case the embedded form listens for one
+
+    NOTE: Confirm the exact prefill mechanism (URL param key vs postMessage
+    contract) against your current GoHighLevel form configuration — the
+    iframe is cross-origin, so this cannot be verified from this file alone.
+  */
+  function pushSummaryToGHLForm(summary){
+    const iframe = document.getElementById('inline-I0W15bpSf2WEndcCGuQ2');
+    if(!iframe) return;
+    const p = property();
+
+    const params = new URLSearchParams();
+    params.set('client_intent_summary', summary);
+    params.set('property_of_interest', `${p.address}, ${p.city}`);
+    params.set('agent_name', agentName);
+    const baseSrc = 'https://api.leadconnectorhq.com/widget/form/I0W15bpSf2WEndcCGuQ2';
+    iframe.src = `${baseSrc}?${params.toString()}`;
+
+    iframe.addEventListener('load', function onLoad(){
+      try{
+        iframe.contentWindow.postMessage({
+          type:'prefill',
+          fields:{
+            client_intent_summary: summary,
+            property_of_interest: `${p.address}, ${p.city}`,
+            agent_name: agentName
+          }
+        }, '*');
+      }catch(err){ /* cross-origin, expected to potentially no-op */ }
+      iframe.removeEventListener('load', onLoad);
+    });
+  }
+
+  document.getElementById('goldenCtaBtn').addEventListener('click', function(){
+    openRequestModal();
+    showToast(`Your profile has been bundled and sent to ${agentName.split(' ')[0]}.`);
+  });
+
+  /* =========================================================
+     TOAST
+     ========================================================= */
+  let toastTimer = null;
+  function showToast(msg){
+    const toast = document.getElementById('toast');
+    document.getElementById('toastText').textContent = msg;
+    toast.classList.remove('opacity-0','pointer-events-none');
+    toast.classList.add('opacity-100');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toast.classList.add('opacity-0','pointer-events-none');
+      toast.classList.remove('opacity-100');
+    }, 3200);
+  }
+
+  /* =========================================================
+     INIT
+     ========================================================= */
+  renderActiveProperty();
+  renderAdditionalListings();
+  recalcBudget();
+  updateFitRing();
+  updateBrief();
+  updateCompleteness();
+  updateChatProgressLabel();
+  advanceChat(); // auto-start the inline AI assistant conversation
+
+})();
+</script>
+
+</body>
+</html>
