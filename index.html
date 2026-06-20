@@ -80,6 +80,7 @@
   .viewer-frame{ position:relative; width:100%; aspect-ratio:16/10; background:#0A0A0C; border-radius:1rem; overflow:hidden; }
   .viewer-frame iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
   .viewer-loading{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.75rem; background:#0A0A0C; transition:opacity .5s ease; }
+  .viewer-error{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.5rem; background:#0A0A0C; padding:1.5rem; text-align:center; z-index:5; }
 
   @media (prefers-reduced-motion: reduce){
     .scanline::after, .pulse-dot, .typing-caret, .card-rise, .match-ring circle{ animation:none !important; transition:none !important; }
@@ -173,11 +174,19 @@
           </svg>
           <p class="font-ui text-[12px] text-[var(--bone-dim)]">Loading 3D splat render&hellip;</p>
         </div>
-        <iframe id="splatEmbed" src="https://lumalabs.ai/embed/REPLACE-WITH-CAPTURE-ID?mode=sparkles&background=%23000000&color=%23ffffff&showTitle=false&loadBg=true&logoPosition=bottom-left&infoPosition=bottom-right&cinematicVideo=undefined&showMenu=false" title="3D Gaussian Splat walkthrough of 108 Springbank Hill Drive SW" allow="autoplay; fullscreen; xr-spatial-tracking" loading="lazy"></iframe>
+        <div class="viewer-error" id="viewerError" style="display:none;">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" class="opacity-70">
+            <path d="M12 9v4M12 17h.01" stroke="#C97B4A" stroke-width="1.8" stroke-linecap="round"/>
+            <circle cx="12" cy="12" r="9" stroke="#C97B4A" stroke-width="1.4"/>
+          </svg>
+          <p class="font-ui text-[12.5px] text-[var(--bone)] font-medium mt-1">3D walkthrough unavailable</p>
+          <p class="font-ui text-[11.5px] text-[var(--bone-dim)] text-center max-w-[280px] leading-relaxed" id="viewerErrorDetail">The capture link for this listing hasn't been added yet, or couldn't be loaded.</p>
+        </div>
+        <iframe id="splatEmbed" src="" title="3D Gaussian Splat walkthrough" allow="autoplay; fullscreen; xr-spatial-tracking" loading="lazy"></iframe>
         <div class="scanline"></div>
         <span class="absolute top-3 left-3 flex items-center gap-1.5 bg-black/55 backdrop-blur-md border border-white/15 rounded-full pl-2 pr-3 py-1.5 z-10">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 2l9 4.9v10.2L12 22l-9-4.9V6.9L12 2Z" stroke="#C9A368" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 22V12M3 6.9 12 12l9-5.1" stroke="#C9A368" stroke-width="1.6" stroke-linejoin="round"/></svg>
-          <span class="font-ui text-[10.5px] font-medium text-white tracking-wide">Live 3D Splat &middot; Luma AI</span>
+          <span class="font-ui text-[10.5px] font-medium text-white tracking-wide" id="viewerSourceLabel">Live 3D Splat &middot; Polycam</span>
         </span>
         <div class="absolute top-3 right-3 bg-black/55 backdrop-blur-md border border-white/15 rounded-full w-12 h-12 flex items-center justify-center z-10" title="Profile fit score">
           <svg class="match-ring" id="fitRing" width="48" height="48" viewBox="0 0 48 48">
@@ -191,11 +200,12 @@
       <div class="flex items-center justify-between gap-3 flex-wrap">
         <p class="font-ui text-[11.5px] text-[var(--bone-dim)] flex items-center gap-1.5">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#A8A6A0" stroke-width="1.4"/><path d="M12 8v4l2.5 2.5" stroke="#A8A6A0" stroke-width="1.4" stroke-linecap="round"/></svg>
-          Drag to orbit &middot; scroll to zoom &middot; captured via Luma AI
+          Drag to orbit &middot; scroll to zoom &middot; captured via Polycam
         </p>
-        <!-- ADDED ID HERE: id="realtorDeepLinkBtn" -->
-        <a id="realtorDeepLinkBtn" href="https://www.realtor.ca" target="_blank" rel="noopener" class="inline-flex items-center gap-2 font-ui text-[12.5px] font-semibold text-[var(--bone)] border border-[var(--hair)] hover:border-[var(--gold)]/60 rounded-full px-4 py-2 transition-colors focus-gold">
-          View Full Listing &amp; Technical Specs on Realtor.ca
+        <!-- id is "viewListingLink" (an earlier draft used "realtorDeepLinkBtn" — renamed since this link
+             can point at any MLS/listing site per property, not just Realtor.ca) -->
+        <a id="viewListingLink" href="#" target="_blank" rel="noopener" class="inline-flex items-center gap-2 font-ui text-[12.5px] font-semibold text-[var(--bone)] border border-[var(--hair)] hover:border-[var(--gold)]/60 rounded-full px-4 py-2 transition-colors focus-gold">
+          <span id="viewListingLabel">View Full Listing &amp; Technical Specs</span>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M7 17 17 7M9 7h8v8" stroke="#C9A368" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
       </div>
@@ -435,6 +445,8 @@
      THE PROPERTY (and the agent's other listings)
      This single-property portal is generated from one agent
      intake submission (GoHighLevel form -> Gaussian build pipeline).
+     In production these objects are populated server-side; here
+     they're hardcoded as representative listings for this workflow.
      ========================================================= */
   const listings = [
     {
@@ -444,8 +456,13 @@
       beds:5, baths:4, sqft:3380, lot:'0.31 ac', type:'Detached',
       eyebrow:'Springbank Hill &middot; Calgary, AB &middot; 3D Gaussian Splat Walkthrough',
       description:"A quietly composed five-bedroom estate set against the escarpment in Springbank Hill, built for a household that values light, distance from the road, and room to spread out. Walk every sightline above before booking a showing &mdash; the agent sees exactly what drew you in.",
-      embedUrl:'https://lumalabs.ai/embed/REPLACE-WITH-CAPTURE-ID?mode=sparkles&background=%23000000&color=%23ffffff&showTitle=false&loadBg=true&logoPosition=bottom-left&infoPosition=bottom-right&cinematicVideo=undefined&showMenu=false',
+      embedUrl:'https://poly.cam/capture/REPLACE-WITH-CAPTURE-ID/embed',
+      // The agent's real MLS/listing-site URL for this specific property,
+      // submitted at intake. This is what powers "View Full Listing".
+      listingUrl:'https://www.realtor.ca/real-estate/REPLACE-WITH-MLS-LISTING-ID/108-springbank-hill-drive-sw-calgary',
       thumb:'linear-gradient(135deg,#2a2a30,#16161a)',
+      // Attributes this specific home offers, scored 0-100, used to
+      // compute the live "fit score" against the client's weighted priorities.
       attrs:{ commute:48, space:95, school:90, walk:30, privacy:88 }
     },
     {
@@ -455,36 +472,649 @@
       beds:4, baths:3, sqft:2980, lot:'0.24 ac', type:'Detached',
       eyebrow:'Discovery Ridge &middot; Calgary, AB &middot; 3D Gaussian Splat Walkthrough',
       description:"A walk-out bungalow backing onto the ravine, with a wall of west-facing glass and a layout built around single-level living. Quieter street, shorter commute to the mountains than to downtown.",
-      embedUrl:'https://lumalabs.ai/embed/REPLACE-WITH-ANOTHER-ID',
-      thumb:'linear-gradient(135deg,#1c1c21,#121214)',
-      attrs:{ commute:40, space:85, school:80, walk:45, privacy:95 }
+      embedUrl:'https://poly.cam/capture/REPLACE-WITH-CAPTURE-ID-2/embed',
+      listingUrl:'https://www.realtor.ca/real-estate/REPLACE-WITH-MLS-LISTING-ID-2/214-discovery-ridge-close-sw-calgary',
+      thumb:'linear-gradient(135deg,#2f261c,#16161a)',
+      attrs:{ commute:52, space:82, school:80, walk:34, privacy:85 }
+    },
+    {
+      address:'77 Cranston Ridge SE',
+      city:'Cranston, Calgary',
+      price:746000,
+      beds:3, baths:3, sqft:2150, lot:'0.16 ac', type:'Detached',
+      eyebrow:'Cranston &middot; Calgary, AB &middot; 3D Gaussian Splat Walkthrough',
+      description:"A move-in ready family home in one of the city's most established SE communities, close to schools, the river pathway system, and quick highway access south.",
+      embedUrl:'https://poly.cam/capture/REPLACE-WITH-CAPTURE-ID-3/embed',
+      listingUrl:'https://www.realtor.ca/real-estate/REPLACE-WITH-MLS-LISTING-ID-3/77-cranston-ridge-se-calgary',
+      thumb:'linear-gradient(135deg,#1c2a24,#16161a)',
+      attrs:{ commute:60, space:64, school:62, walk:48, privacy:66 }
+    },
+    {
+      address:'1602 17 Ave SW, Unit 9',
+      city:'Beltline, Calgary',
+      price:412000,
+      beds:1, baths:1, sqft:680, lot:'N/A', type:'Apartment',
+      eyebrow:'Beltline &middot; Calgary, AB &middot; 3D Gaussian Splat Walkthrough',
+      description:"A top-floor corner unit two blocks off 17th Ave, built for someone who wants to walk to everything and never think about a commute again.",
+      embedUrl:'https://poly.cam/capture/REPLACE-WITH-CAPTURE-ID-4/embed',
+      listingUrl:'https://www.realtor.ca/real-estate/REPLACE-WITH-MLS-LISTING-ID-4/1602-17-ave-sw-unit-9-calgary',
+      thumb:'linear-gradient(135deg,#241c2a,#16161a)',
+      attrs:{ commute:97, space:35, school:15, walk:98, privacy:20 }
     }
   ];
 
+  let activeIndex = 0;
+  function property(){ return listings[activeIndex]; }
+  const agentName = 'Renée Marchetti';
+
   /* =========================================================
-     DYNAMIC REALTOR DEEP-LINK LOGIC
-     Reads '?realtor=...' from address bar and binds it to the layout.
+     DEEP-LINK OVERRIDE — ?realtor=<url>
+     Lets a single deployed page (e.g. one linked from a Facebook/
+     Instagram ad, or a QR code on a yard sign) point "View Full
+     Listing" at a specific MLS URL without touching the listings
+     data. This takes priority over the per-listing `listingUrl`
+     field whenever it's present, since it's a more specific,
+     deploy-time instruction. Read once at load — if an agent wants
+     this permanently, the listingUrl field is the right place.
      ========================================================= */
   const urlParams = new URLSearchParams(window.location.search);
-  const realtorLink = urlParams.get('realtor');
-  const viewListingBtn = document.getElementById('realtorDeepLinkBtn');
+  const realtorLinkOverride = urlParams.get('realtor');
 
-  if (viewListingBtn && realtorLink) {
-    // Inject custom listing page dynamically if parameter is present
-    viewListingBtn.setAttribute('href', realtorLink);
+  /* =========================================================
+     GLOBAL CLIENT PROFILE STATE
+     ========================================================= */
+  const clientProfile = {
+    lifestyle: { commute:70, space:55, school:30, walk:45, privacy:60 },
+    commuteTarget: null,
+    budget: { price:1245000, downPct:20, rate:4.9, condo:0, allIn:0 },
+    notes: [],
+    chatAnswers: {}
+  };
+
+  function fmtMoney(n){ return '$' + Math.round(n).toLocaleString('en-US'); }
+
+  /* =========================================================
+     FIT SCORE — this client's weighted priorities vs THIS home
+     ========================================================= */
+  function computeFit(){
+    const w = clientProfile.lifestyle;
+    const p = property();
+    const totalWeight = w.commute + w.space + w.school + w.walk + w.privacy || 1;
+    const score =
+      (p.attrs.commute * w.commute) +
+      (p.attrs.space   * w.space) +
+      (p.attrs.school  * w.school) +
+      (p.attrs.walk    * w.walk) +
+      (p.attrs.privacy * w.privacy);
+    return Math.round(score / totalWeight);
   }
 
-  // Basic Iframe Loaded Event to Hide Loading Screen
+  function topFitReason(){
+    const w = clientProfile.lifestyle;
+    const p = property();
+    const dims = [
+      { label:'commute', weight:w.commute, score:p.attrs.commute },
+      { label:'space', weight:w.space, score:p.attrs.space },
+      { label:'schools', weight:w.school, score:p.attrs.school },
+      { label:'walkability', weight:w.walk, score:p.attrs.walk },
+      { label:'privacy', weight:w.privacy, score:p.attrs.privacy }
+    ];
+    dims.sort((a,b) => (b.weight*b.score) - (a.weight*a.score));
+    const best = dims[0];
+    const worst = dims[dims.length-1];
+    const overBudget = p.price > clientProfile.budget.price * 1.05;
+    if(overBudget){
+      return { text:`Strong on ${best.label}, but ~${fmtMoney(p.price - clientProfile.budget.price)} over your target budget`, warn:true };
+    }
+    if(best.score >= 75){
+      return { text:`Best aligned on ${best.label} — matches your top priority`, warn:false };
+    }
+    return { text:`Moderate fit. ${worst.label} scores lowest against your weighting`, warn:true };
+  }
+
+  function updateFitRing(){
+    const fit = computeFit();
+    const r = 19, c = 2*Math.PI*r;
+    const offset = c - (fit/100)*c;
+    const color = fit >= 90 ? 'var(--signal)' : fit >= 75 ? 'var(--gold)' : 'var(--rust)';
+    const ring = document.getElementById('fitRingProgress');
+    ring.style.stroke = color;
+    ring.setAttribute('stroke-dasharray', c.toFixed(1));
+    ring.setAttribute('stroke-dashoffset', offset.toFixed(1));
+    document.getElementById('fitScoreLabel').textContent = fit + '%';
+
+    const note = topFitReason();
+    const fitNoteEl = document.getElementById('budgetFitNote');
+    fitNoteEl.textContent = note.text;
+    fitNoteEl.className = 'font-ui text-[11px] mt-3 ' + (note.warn ? 'text-[var(--rust)]' : 'text-[var(--signal)]');
+  }
+
+  /* =========================================================
+     3D VIEWER — URL normalization, validation, load/error states
+
+     Agents paste raw Polycam share links from a separate GHL intake
+     form. Polycam's embeddable URL is the capture link with a
+     trailing /embed segment (https://poly.cam/capture/{ID}/embed).
+     Agents most often copy the plain share link without that
+     segment, so we auto-append it rather than relying on them to
+     find the "Copy Embed Code" option. Anything that isn't a
+     poly.cam capture link is flagged with a clear reason instead of
+     silently failing.
+     ========================================================= */
   const splatEmbed = document.getElementById('splatEmbed');
   const viewerLoading = document.getElementById('viewerLoading');
-  if(splatEmbed && viewerLoading) {
-    splatEmbed.onload = function() {
-      viewerLoading.style.opacity = '0';
-      setTimeout(() => viewerLoading.style.display = 'none', 500);
-    };
+  const viewerError = document.getElementById('viewerError');
+  const viewerErrorDetail = document.getElementById('viewerErrorDetail');
+  const viewerSourceLabel = document.getElementById('viewerSourceLabel');
+
+  // Validates a Polycam capture link and normalizes it to the
+  // embeddable /embed URL shape. Returns { ok:true, url } or
+  // { ok:false, reason }.
+  function resolveEmbedUrl(raw){
+    if(!raw || typeof raw !== 'string' || raw.trim() === ''){
+      return { ok:false, reason:'No Polycam capture link has been added for this listing yet.' };
+    }
+    const url = raw.trim();
+    if(url.indexOf('REPLACE-WITH') !== -1){
+      return { ok:false, reason:'This listing is using a placeholder capture link — paste the real Polycam link in the intake form.' };
+    }
+
+    let parsed;
+    try{ parsed = new URL(url); }
+    catch(err){ return { ok:false, reason:'That capture link doesn\'t look like a valid URL.' }; }
+
+    const host = parsed.hostname.replace(/^www\./,'');
+    if(host !== 'poly.cam' && host !== 'polycam.com'){
+      return { ok:false, reason:`"${host}" isn't a Polycam link — paste the capture link from poly.cam.` };
+    }
+
+    const captureMatch = parsed.pathname.match(/^\/capture\/([a-zA-Z0-9-]+)/);
+    if(!captureMatch){
+      return { ok:false, reason:'That Polycam link isn\'t in a recognized format. Use the capture link from Polycam\'s share menu (poly.cam/capture/...).' };
+    }
+
+    const id = captureMatch[1];
+    return { ok:true, url:`https://poly.cam/capture/${id}/embed` };
   }
+
+  function armViewerLoadingState(){
+    viewerError.style.display = 'none';
+    viewerLoading.style.display = 'flex';
+    viewerLoading.style.opacity = '1';
+  }
+
+  function showViewerError(reason){
+    viewerLoading.style.display = 'none';
+    viewerError.style.display = 'flex';
+    viewerErrorDetail.textContent = reason;
+    splatEmbed.style.visibility = 'hidden';
+  }
+
+  function hideViewerLoading(){
+    viewerLoading.style.opacity = '0';
+    setTimeout(() => { viewerLoading.style.display = 'none'; }, 500);
+  }
+
+  splatEmbed.addEventListener('load', function(){
+    // Note: an iframe "load" event fires even for the destination's own
+    // 404/error page, since that's still a successful HTTP response as
+    // far as the browser is concerned — cross-origin restrictions mean
+    // we can't inspect what actually rendered inside it. The format
+    // validation above is the real safety net; this just clears the
+    // loading spinner once the request resolves.
+    if(splatEmbed.src){ hideViewerLoading(); }
+  });
+
+  let viewerFallbackTimer = null;
+  function arm6sFallback(){
+    clearTimeout(viewerFallbackTimer);
+    viewerFallbackTimer = setTimeout(() => {
+      if(viewerLoading.style.display !== 'none'){ hideViewerLoading(); }
+    }, 6000);
+  }
+
+  function loadViewer(rawUrl){
+    const result = resolveEmbedUrl(rawUrl);
+    if(!result.ok){
+      armViewerLoadingState();
+      showViewerError(result.reason);
+      return;
+    }
+    splatEmbed.style.visibility = 'visible';
+    armViewerLoadingState();
+    viewerSourceLabel.textContent = 'Live 3D Splat · Polycam';
+    splatEmbed.src = result.url;
+    arm6sFallback();
+  }
+
+  /* =========================================================
+     RENDER ACTIVE PROPERTY DETAILS (header, facts strip, copy)
+     ========================================================= */
+  function fmtSpecs(p){
+    return `${p.beds} bd &middot; ${p.baths} ba &middot; ${p.sqft.toLocaleString()} sqft &middot; ${p.type}`;
+  }
+
+  // Friendly site name for the listing button label, derived from the
+  // agent-submitted listingUrl. Falls back to a generic label if the
+  // domain isn't one we recognize, or if the URL is still a placeholder.
+  function listingSiteName(url){
+    if(!url || url.indexOf('REPLACE-WITH') !== -1) return null;
+    try{
+      const host = new URL(url).hostname.replace(/^www\./,'');
+      const known = {
+        'realtor.ca':'Realtor.ca',
+        'zillow.com':'Zillow',
+        'redfin.com':'Redfin',
+        'point2homes.com':'Point2Homes',
+        'centris.ca':'Centris'
+      };
+      return known[host] || host;
+    }catch(err){ return null; }
+  }
+
+  function renderActiveProperty(){
+    const p = property();
+    document.getElementById('propertyEyebrow').innerHTML = p.eyebrow;
+    document.getElementById('propertyH1').textContent = p.address;
+    document.getElementById('propertyPriceLabel').textContent = fmtMoney(p.price);
+    document.getElementById('propertySpecsLabel').innerHTML = fmtSpecs(p);
+    document.getElementById('factBeds').textContent = `${p.beds} / ${p.baths}`;
+    document.getElementById('factSqft').textContent = p.sqft.toLocaleString();
+    document.getElementById('factType').textContent = p.type;
+    document.getElementById('factLot').textContent = p.lot;
+    document.getElementById('propertyDescription').innerHTML = p.description;
+    document.title = `${p.address} — Gaussian Property Portal`;
+
+    // "View Full Listing" — point at this property's real MLS/listing URL.
+    // A `?realtor=` query param on the page URL overrides the data-driven
+    // listingUrl for whichever listing is currently active (useful for a
+    // single deployed link/QR code that should always point at one
+    // specific MLS page regardless of which listing card is open).
+    const linkEl = document.getElementById('viewListingLink');
+    const labelEl = document.getElementById('viewListingLabel');
+    const effectiveUrl = realtorLinkOverride || p.listingUrl;
+    const siteName = listingSiteName(effectiveUrl);
+    linkEl.href = effectiveUrl || '#';
+    labelEl.textContent = siteName
+      ? `View Full Listing & Technical Specs on ${siteName}`
+      : `View Full Listing & Technical Specs`;
+
+    // swap the 3D viewer (validated + normalized)
+    loadViewer(p.embedUrl);
+  }
+
+  /* =========================================================
+     AGENT'S ADDITIONAL LISTINGS — mock cards + "IMMEDIATE VIEW 3D"
+     ========================================================= */
+  function renderAdditionalListings(){
+    const wrap = document.getElementById('additionalListings');
+    wrap.innerHTML = '';
+    listings.forEach((p, idx) => {
+      if(idx === activeIndex) return; // don't show the currently-active listing in its own list
+      const card = document.createElement('div');
+      card.className = 'flex items-center gap-4 bg-[var(--panel)] border border-[var(--hair)] rounded-2xl p-4 card-rise';
+      card.innerHTML = `
+        <div class="w-24 h-20 sm:w-28 sm:h-24 rounded-xl shrink-0 relative overflow-hidden border border-[var(--hair)]" style="background:${p.thumb}">
+          <span class="absolute top-1.5 left-1.5 flex items-center gap-1 bg-black/55 backdrop-blur-md rounded-full px-1.5 py-0.5">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M12 2l9 4.9v10.2L12 22l-9-4.9V6.9L12 2Z" stroke="#C9A368" stroke-width="2"/></svg>
+            <span class="font-mono text-[7.5px] text-white">3D</span>
+          </span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-display text-[16px] leading-tight">${fmtMoney(p.price)}</p>
+          <p class="font-ui text-[11.5px] text-[var(--bone-dim)] truncate">${p.address}</p>
+          <p class="font-mono text-[10px] text-[var(--bone-dim)] mt-0.5">${p.beds} bed, ${p.baths} bath &middot; ${p.sqft.toLocaleString()} sqft</p>
+        </div>
+        <button class="view-3d-btn shrink-0 font-ui text-[11px] font-bold bg-[var(--gold)] text-black rounded-lg px-3.5 py-2.5 hover:bg-[var(--gold-soft)] transition-colors focus-gold whitespace-nowrap" data-index="${idx}">
+          IMMEDIATE VIEW 3D
+        </button>
+      `;
+      wrap.appendChild(card);
+    });
+  }
+
+  document.getElementById('additionalListings').addEventListener('click', function(e){
+    const btn = e.target.closest('.view-3d-btn');
+    if(!btn) return;
+    activeIndex = parseInt(btn.dataset.index, 10);
+    renderActiveProperty();
+    renderAdditionalListings();
+    updateFitRing();
+    updateBrief();
+    showToast(`Now viewing ${property().address}`);
+    document.getElementById('viewerFrame').scrollIntoView({ behavior:'smooth', block:'center' });
+  });
+
+  /* =========================================================
+     LIFESTYLE SLIDERS
+     ========================================================= */
+  ['commute','space','school','walk','privacy'].forEach(key => {
+    const el = document.getElementById('slider-' + key);
+    const val = document.getElementById('val-' + key);
+    el.addEventListener('input', function(){
+      clientProfile.lifestyle[key] = parseInt(this.value, 10);
+      val.textContent = this.value + '%';
+      updateFitRing();
+      updateBrief();
+      updateCompleteness();
+    });
+  });
+
+  document.getElementById('commutePresets').addEventListener('click', function(e){
+    const chip = e.target.closest('.preset-chip');
+    if(!chip) return;
+    document.querySelectorAll('#commutePresets .preset-chip').forEach(c => {
+      c.classList.remove('border-[var(--gold)]','text-[var(--bone)]');
+      c.style.background = '';
+    });
+    chip.classList.add('border-[var(--gold)]','text-[var(--bone)]');
+    chip.style.background = 'rgba(201,163,104,0.12)';
+    clientProfile.commuteTarget = chip.dataset.target;
+    showToast(`Commute anchor set to ${chip.dataset.target}`);
+    updateBrief();
+    updateCompleteness();
+  });
+
+  /* =========================================================
+     ALL-IN BUDGET CALCULATOR
+     ========================================================= */
+  const priceInput = document.getElementById('purchasePrice');
+  const downInput = document.getElementById('downPayment');
+  const rateInput = document.getElementById('rate');
+  const condoInput = document.getElementById('condoFees');
+
+  function recalcBudget(){
+    const price = parseFloat(priceInput.value.replace(/[^0-9.]/g,'')) || 0;
+    const downPct = parseFloat(downInput.value.replace(/[^0-9.]/g,'')) || 0;
+    const rate = parseFloat(rateInput.value.replace(/[^0-9.]/g,'')) || 0;
+    const condo = parseFloat(condoInput.value.replace(/[^0-9.]/g,'')) || 0;
+
+    const loanAmt = price * (1 - downPct/100);
+    const monthlyRate = (rate/100) / 12;
+    const n = 25 * 12;
+    let mortgage = 0;
+    if(monthlyRate > 0){
+      mortgage = loanAmt * (monthlyRate * Math.pow(1+monthlyRate, n)) / (Math.pow(1+monthlyRate, n) - 1);
+    } else {
+      mortgage = loanAmt / n;
+    }
+    const tax = (price * 0.005) / 12;
+    const insurance = Math.max(80, price * 0.00018);
+    const allIn = mortgage + tax + insurance + condo;
+
+    clientProfile.budget = { price, downPct, rate, condo, allIn };
+
+    document.getElementById('budgetTotal').textContent = fmtMoney(allIn);
+    document.getElementById('bdMortgage').textContent = fmtMoney(mortgage);
+    document.getElementById('bdTax').textContent = fmtMoney(tax);
+    document.getElementById('bdInsurance').textContent = fmtMoney(insurance);
+    document.getElementById('bdCondo').textContent = fmtMoney(condo);
+
+    const total = mortgage + tax + insurance + condo || 1;
+    document.getElementById('bdBarMortgage').style.width = (mortgage/total*100) + '%';
+    document.getElementById('bdBarTax').style.width = (tax/total*100) + '%';
+    document.getElementById('bdBarInsurance').style.width = (insurance/total*100) + '%';
+    document.getElementById('bdBarCondo').style.width = (condo/total*100) + '%';
+
+    updateFitRing();
+    updateBrief();
+    updateCompleteness();
+  }
+  [priceInput, downInput, rateInput, condoInput].forEach(input => input.addEventListener('input', recalcBudget));
+
+  /* =========================================================
+     AI CLIENT ASSISTANT CHATBOT (simulated, always-on inline panel)
+     ========================================================= */
+  const chatBody = document.getElementById('chatBody');
+  const chatOptions = document.getElementById('chatOptions');
+  const chatInput = document.getElementById('chatInput');
+
+  function buildChatScript(){
+    const p = property();
+    return [
+      { bot:`Hi! I'm putting together your brief for Renée on ${p.address}. First — any pets I should note for yard size or flooring considerations?`, key:'pets', options:['Two large dogs', 'One cat', 'No pets', 'Other (type below)'] },
+      { bot:"Got it. Any non-negotiable must-haves for this home? Things you won't compromise on.", key:'mustHaves', options:['Home office space', 'Attached garage', 'Move-in ready', 'Open-concept kitchen'] },
+      { bot:"And dealbreakers — anything that would take this property off the list immediately?", key:'dealbreakers', options:['Busy main road', 'No yard', 'Needs renovation', 'Steep driveway'] },
+      { bot:"Last one — what's your ideal move-in timeline?", key:'timeline', options:['Within 30 days', '1–3 months', '3–6 months', 'Just exploring'] },
+      { bot:"Perfect — that gives Renée a complete picture for this property. Keep chatting any time to add more notes, or use the gold button above the viewer to send your profile.", key:'done', options:[] }
+    ];
+  }
+  let chatScript = buildChatScript();
+  let chatStep = 0;
+
+  function appendMsg(role, text){
+    const div = document.createElement('div');
+    if(role === 'bot'){
+      div.className = 'flex gap-2.5 max-w-[88%]';
+      div.innerHTML = `<div class="bg-[var(--panel-soft)] border border-[var(--hair)] rounded-2xl rounded-bl-sm px-3.5 py-2.5 font-ui text-[13px] leading-relaxed text-[var(--bone-dim)]">${text}</div>`;
+    } else {
+      div.className = 'flex gap-2.5 max-w-[88%] ml-auto flex-row-reverse';
+      div.innerHTML = `<div class="bg-[var(--gold)] text-black rounded-2xl rounded-br-sm px-3.5 py-2.5 font-ui text-[13px] font-medium leading-relaxed">${text}</div>`;
+    }
+    chatBody.appendChild(div);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    return div;
+  }
+
+  function showTyping(){
+    const div = document.createElement('div');
+    div.className = 'flex gap-2.5 max-w-[88%]';
+    div.innerHTML = `<div class="bg-[var(--panel-soft)] border border-[var(--hair)] rounded-2xl rounded-bl-sm px-3.5 py-3"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+    chatBody.appendChild(div);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    return div;
+  }
+
+  function renderChatOptions(){
+    const step = chatScript[chatStep];
+    chatOptions.innerHTML = '';
+    if(!step || step.options.length === 0) return;
+    step.options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'w-full text-left font-ui text-[11.5px] px-3 py-2 rounded-lg bg-[var(--panel-soft)] border border-[var(--hair)] text-[var(--bone-dim)] hover:border-[var(--gold)]/60 hover:text-[var(--bone)] transition-colors focus-gold';
+      btn.textContent = opt;
+      btn.addEventListener('click', () => handleChatAnswer(opt));
+      chatOptions.appendChild(btn);
+    });
+  }
+
+  function advanceChat(){
+    const step = chatScript[chatStep];
+    if(!step) return;
+    const typing = showTyping();
+    setTimeout(() => {
+      typing.remove();
+      appendMsg('bot', step.bot);
+      renderChatOptions();
+    }, 650);
+  }
+
+  function handleChatAnswer(answer){
+    const step = chatScript[chatStep];
+    appendMsg('user', answer);
+    chatOptions.innerHTML = '';
+
+    if(step.key !== 'done'){
+      clientProfile.chatAnswers[step.key] = answer;
+      if(answer.toLowerCase().indexOf('other') === -1){
+        clientProfile.notes.push(answer);
+      }
+    }
+    chatStep++;
+    updateChatProgressLabel();
+    updateBrief();
+    updateCompleteness();
+
+    if(chatStep < chatScript.length){ advanceChat(); }
+  }
+
+  function updateChatProgressLabel(){
+    const captured = Math.min(chatStep, chatScript.length - 1);
+    document.getElementById('chatProgressLabel').textContent = `${captured} of ${chatScript.length - 1} notes captured`;
+  }
+
+  document.getElementById('chatSendBtn').addEventListener('click', sendFreeText);
+  chatInput.addEventListener('keydown', function(e){ if(e.key === 'Enter') sendFreeText(); });
+
+  function sendFreeText(){
+    const text = chatInput.value.trim();
+    if(!text) return;
+    appendMsg('user', text);
+    clientProfile.notes.push(text);
+    chatInput.value = '';
+    updateBrief();
+    updateCompleteness();
+
+    const typing = showTyping();
+    setTimeout(() => {
+      typing.remove();
+      appendMsg('bot', "Noted — added that to your brief for Renée. " + (chatStep < chatScript.length ? "Anything else, or want to continue?" : "Your profile is looking solid."));
+      renderChatOptions();
+    }, 600);
+  }
+
+  /* =========================================================
+     SYNTHESIZED CLIENT BRIEF (feeds GHL client_intent_summary)
+     ========================================================= */
+  function topPriorities(){
+    const w = clientProfile.lifestyle;
+    const arr = [
+      { label:'Commute', v:w.commute }, { label:'Space', v:w.space },
+      { label:'Schools', v:w.school }, { label:'Walkability', v:w.walk },
+      { label:'Privacy/Yard', v:w.privacy }
+    ];
+    arr.sort((a,b) => b.v - a.v);
+    const total = arr.reduce((s,x) => s + x.v, 0) || 1;
+    return arr.slice(0,2).map(x => `${Math.round(x.v/total*100)}% ${x.label}`).join(', ');
+  }
+
+  function buildBriefText(){
+    const b = clientProfile.budget;
+    const fit = computeFit();
+    const p = property();
+    const lines = [];
+    lines.push(`Property of Interest: ${p.address}, ${p.city} — ${fit}% profile fit.`);
+    lines.push(`Client Priorities: ${topPriorities()}.`);
+    if(clientProfile.commuteTarget){ lines.push(`Commute anchor: ${clientProfile.commuteTarget}.`); }
+    lines.push(`Max Budget: ${fmtMoney(b.allIn)}/mo all-in (≈${fmtMoney(b.price)} purchase, ${b.downPct}% down, ${b.rate}% rate).`);
+    if(clientProfile.notes.length){ lines.push(`Notes: ${clientProfile.notes.join('; ')}.`); }
+    return lines.join(' ');
+  }
+
+  function updateBrief(){
+    document.getElementById('briefBox').textContent = buildBriefText();
+  }
+
+  function updateCompleteness(){
+    let score = 20;
+    const w = clientProfile.lifestyle;
+    const slidersMoved = Object.values(w).filter(v => v !== 70 && v !== 55 && v !== 30 && v !== 45 && v !== 60).length;
+    score += Math.min(20, slidersMoved * 4);
+    if(clientProfile.commuteTarget) score += 10;
+    if(clientProfile.budget.price) score += 15;
+    score += Math.min(35, clientProfile.notes.length * 9);
+    score = Math.min(100, score);
+    document.getElementById('profileCompleteness').textContent = score + '%';
+  }
+
+  /* =========================================================
+     REQUEST INFO MODAL (GoHighLevel) + SEND PROFILE
+     ========================================================= */
+  const requestModal = document.getElementById('requestModal');
+
+  function openRequestModal(){
+    const previewText = document.getElementById('summaryPreviewText');
+    const titleEl = document.getElementById('requestModalTitle');
+    const summary = buildBriefText();
+    titleEl.textContent = `Request Info — ${property().address}`;
+    previewText.textContent = summary;
+    pushSummaryToGHLForm(summary);
+    requestModal.classList.remove('hidden');
+    requestModal.classList.add('flex');
+  }
+
+  document.getElementById('closeRequestModal').addEventListener('click', function(){
+    requestModal.classList.add('hidden'); requestModal.classList.remove('flex');
+  });
+  requestModal.addEventListener('click', function(e){
+    if(e.target === requestModal){ requestModal.classList.add('hidden'); requestModal.classList.remove('flex'); }
+  });
+
+  /*
+    Pushes the synthesized brief into the GoHighLevel embedded form as a
+    hidden/custom field value. GHL inline forms render in an iframe from
+    a separate origin, so direct DOM access is blocked by the browser.
+    We do two best-effort things:
+    1) Append field values as URL query params on the iframe src
+       (?property_of_interest=...&client_intent_summary=...)
+    2) Attempt a postMessage handshake in case the embedded form listens for one
+
+    NOTE: Confirm the exact prefill mechanism (URL param key vs postMessage
+    contract) against your current GoHighLevel form configuration — the
+    iframe is cross-origin, so this cannot be verified from this file alone.
+  */
+  function pushSummaryToGHLForm(summary){
+    const iframe = document.getElementById('inline-I0W15bpSf2WEndcCGuQ2');
+    if(!iframe) return;
+    const p = property();
+
+    const params = new URLSearchParams();
+    params.set('client_intent_summary', summary);
+    params.set('property_of_interest', `${p.address}, ${p.city}`);
+    params.set('agent_name', agentName);
+    const baseSrc = 'https://api.leadconnectorhq.com/widget/form/I0W15bpSf2WEndcCGuQ2';
+    iframe.src = `${baseSrc}?${params.toString()}`;
+
+    iframe.addEventListener('load', function onLoad(){
+      try{
+        iframe.contentWindow.postMessage({
+          type:'prefill',
+          fields:{
+            client_intent_summary: summary,
+            property_of_interest: `${p.address}, ${p.city}`,
+            agent_name: agentName
+          }
+        }, '*');
+      }catch(err){ /* cross-origin, expected to potentially no-op */ }
+      iframe.removeEventListener('load', onLoad);
+    });
+  }
+
+  document.getElementById('goldenCtaBtn').addEventListener('click', function(){
+    openRequestModal();
+    showToast(`Your profile has been bundled and sent to ${agentName.split(' ')[0]}.`);
+  });
+
+  /* =========================================================
+     TOAST
+     ========================================================= */
+  let toastTimer = null;
+  function showToast(msg){
+    const toast = document.getElementById('toast');
+    document.getElementById('toastText').textContent = msg;
+    toast.classList.remove('opacity-0','pointer-events-none');
+    toast.classList.add('opacity-100');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toast.classList.add('opacity-0','pointer-events-none');
+      toast.classList.remove('opacity-100');
+    }, 3200);
+  }
+
+  /* =========================================================
+     INIT
+     ========================================================= */
+  renderActiveProperty();
+  renderAdditionalListings();
+  recalcBudget();
+  updateFitRing();
+  updateBrief();
+  updateCompleteness();
+  updateChatProgressLabel();
+  advanceChat(); // auto-start the inline AI assistant conversation
 
 })();
 </script>
+
 </body>
 </html>
