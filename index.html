@@ -508,17 +508,29 @@
   const agentName = 'Renée Marchetti';
 
   /* =========================================================
-     DEEP-LINK OVERRIDE — ?realtor=<url>
-     Lets a single deployed page (e.g. one linked from a Facebook/
-     Instagram ad, or a QR code on a yard sign) point "View Full
-     Listing" at a specific MLS URL without touching the listings
-     data. This takes priority over the per-listing `listingUrl`
-     field whenever it's present, since it's a more specific,
-     deploy-time instruction. Read once at load — if an agent wants
-     this permanently, the listingUrl field is the right place.
+     DEEP-LINK OVERRIDES — ?realtor=<url> and ?splat_url=<url>
+
+     This page is reached via a GHL form's "On Submit -> Redirect to
+     URL" action, e.g.:
+       https://yourname.github.io/repo/?splat_url={{contact.polycam_link_field}}
+
+     `splat_url` overrides which Polycam capture the 3D viewer loads
+     for the CURRENTLY ACTIVE listing (whichever one is showing —
+     normally listings[0] on a fresh page load). `realtor` does the
+     same for the "View Full Listing" MLS link. Both take priority
+     over the hardcoded per-listing fields whenever present, since a
+     query param is a more specific, deploy-time instruction. Read
+     once at load — if an agent wants a value to stick permanently
+     for a listing, put it directly in the listings[] data instead.
      ========================================================= */
   const urlParams = new URLSearchParams(window.location.search);
   const realtorLinkOverride = urlParams.get('realtor');
+  // splatUrlOverride is `let`, not `const` — it's consumed once on the
+  // initial render, then cleared, so clicking a different listing's
+  // "IMMEDIATE VIEW 3D" afterward correctly falls back to that
+  // listing's own embedUrl instead of getting stuck on whatever the
+  // GHL redirect handed off.
+  let splatUrlOverride = urlParams.get('splat_url');
 
   /* =========================================================
      GLOBAL CLIENT PROFILE STATE
@@ -739,8 +751,14 @@
       ? `View Full Listing & Technical Specs on ${siteName}`
       : `View Full Listing & Technical Specs`;
 
-    // swap the 3D viewer (validated + normalized)
-    loadViewer(p.embedUrl);
+    // swap the 3D viewer (validated + normalized). A `?splat_url=`
+    // query param overrides the data-driven embedUrl for whichever
+    // listing is active — this is how a GHL form redirect hands off
+    // the agent's just-submitted Polycam link to this page. It's
+    // consumed once (see declaration above) so later listing swaps
+    // use each listing's own embedUrl as normal.
+    loadViewer(splatUrlOverride || p.embedUrl);
+    splatUrlOverride = null;
   }
 
   /* =========================================================
