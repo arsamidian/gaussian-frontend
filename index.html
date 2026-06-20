@@ -986,3 +986,44 @@
 
 </body>
 </html>
+<script>
+  // 1. Tell the browser to look at the URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+
+  // 2. Extract the data fields from the URL
+  const propertyAddress = urlParams.get('address');
+  const propertyPrice = urlParams.get('price');
+  const realtorLink = urlParams.get('realtor');
+  const splatFileUrl = urlParams.get('splat');
+
+  // 3. Dynamically update the Text Elements on your dashboard
+  if (propertyAddress) {
+      // Updates your main H1 Title text block
+      document.querySelector('h1').innerText = propertyAddress;
+  }
+  
+  if (propertyPrice) {
+      // Updates your pricing text block if you have one
+      const priceTag = document.getElementById('property-price');
+      if (priceTag) priceTag.innerText = propertyPrice;
+  }
+
+  // 4. Update the "View Full Listing" button link automatically
+  const viewListingBtn = document.getElementById('viewFullListingBtn'); // Make sure your button has this ID!
+  if (viewListingBtn && realtorLink) {
+      viewListingBtn.setAttribute('href', realtorLink);
+      viewListingBtn.setAttribute('target', '_blank'); // Opens in a clean new tab
+  }
+
+  // 5. Load the 3D Walkthrough Player natively
+  if (splatFileUrl) {
+      // If you are using an open-source web-gl viewer framework:
+      // viewer.load(splatFileUrl); 
+      
+      // Or, if you are simply embedding a player engine URL inside an iframe:
+      const videoPlayerIframe = document.getElementById('main3DViewer'); // Make sure your iframe has this ID!
+      if (videoPlayerIframe) {
+          videoPlayerIframe.setAttribute('src', splatFileUrl);
+      }
+  }
+</script>
