@@ -182,7 +182,7 @@
           <p class="font-ui text-[12.5px] text-[var(--bone)] font-medium mt-1">3D walkthrough unavailable</p>
           <p class="font-ui text-[11.5px] text-[var(--bone-dim)] text-center max-w-[280px] leading-relaxed" id="viewerErrorDetail">The capture link for this listing hasn't been added yet, or couldn't be loaded.</p>
         </div>
-        <iframe id="splatEmbed" src="" title="3D Gaussian Splat walkthrough" allow="autoplay; fullscreen; xr-spatial-tracking" loading="lazy"></iframe>
+        <iframe id="splatEmbed" src="" title="3D Gaussian Splat walkthrough" allow="fullscreen; xr-spatial-tracking" loading="lazy"></iframe>
         <div class="scanline"></div>
         <span class="absolute top-3 left-3 flex items-center gap-1.5 bg-black/55 backdrop-blur-md border border-white/15 rounded-full pl-2 pr-3 py-1.5 z-10">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 2l9 4.9v10.2L12 22l-9-4.9V6.9L12 2Z" stroke="#C9A368" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 22V12M3 6.9 12 12l9-5.1" stroke="#C9A368" stroke-width="1.6" stroke-linejoin="round"/></svg>
@@ -651,17 +651,26 @@
     const host = parsed.hostname.replace(/^www\./, '');
 
     // ── SuperSplat (PlayCanvas) ──────────────────────────────────
-    // Expected shape: https://superspl.at/scene/<id>
-    // or:             https://superspl.at/scene/<id>/studio
-    // Normalise to the base scene URL — /studio is the editor view
-    // and returns 404 when embedded; the base URL is the public viewer.
+    // Two accepted input shapes:
+    // 1. Full scene page: https://superspl.at/scene/<id>  (or /scene/<id>/studio)
+    //    → converted to the clean embed URL: https://superspl.at/s?id=<id>
+    // 2. Already an embed URL: https://superspl.at/s?id=<id>
+    //    → used as-is
+    // The embed URL strips all SuperSplat website chrome (header, banners,
+    // comments, suggested scenes) and serves just the raw 3D viewer canvas.
     if(host === 'superspl.at'){
+      // Already an embed URL — use as-is
+      if(parsed.pathname === '/s' && parsed.searchParams.get('id')){
+        const id = parsed.searchParams.get('id');
+        return { ok:true, url:`https://superspl.at/s?id=${id}`, source:'SuperSplat · Walk Mode' };
+      }
+      // Full scene URL — extract ID and convert to embed format
       const sceneMatch = parsed.pathname.match(/^\/scene\/([a-zA-Z0-9_-]+)/);
       if(!sceneMatch){
-        return { ok:false, reason:'That SuperSplat link isn\'t in a recognized format. Use the scene URL from superspl.at/scene/...' };
+        return { ok:false, reason:'That SuperSplat link isn\'t in a recognized format. Use the scene URL from superspl.at/scene/... or the embed URL from the Embed button.' };
       }
       const id = sceneMatch[1];
-      return { ok:true, url:`https://superspl.at/scene/${id}`, source:'SuperSplat · Walk Mode' };
+      return { ok:true, url:`https://superspl.at/s?id=${id}`, source:'SuperSplat · Walk Mode' };
     }
 
     // ── Polycam (legacy orbit viewer) ───────────────────────────
