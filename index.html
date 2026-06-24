@@ -512,7 +512,14 @@
 
      This page is reached via a GHL form's "On Submit -> Redirect to
      URL" action, e.g.:
-       https://yourname.github.io/repo/?splat_url={{contact.polycam_link_field}}
+       https://yourname.github.io/repo/?splat_url={{contact.3d_tour_url}}
+
+       WORKFLOW FOR AGENTS:
+       1. Scan the home in Polycam (Space Mode, LiDAR iPhone)
+       2. Export the capture as a .ply file from Polycam
+       3. Upload the .ply to superspl.at — it generates a scene URL
+       4. Paste that superspl.at/scene/... URL into the GHL intake form
+       5. GHL redirect passes it here as ?splat_url= and Walk Mode loads
 
      `splat_url` overrides which Polycam capture the 3D viewer loads
      for the CURRENTLY ACTIVE listing (whichever one is showing —
@@ -604,14 +611,19 @@
   /* =========================================================
      3D VIEWER — URL normalization, validation, load/error states
 
-     Agents paste raw Polycam share links from a separate GHL intake
-     form. Polycam's embeddable URL is the capture link with a
-     trailing /embed segment (https://poly.cam/capture/{ID}/embed).
-     Agents most often copy the plain share link without that
-     segment, so we auto-append it rather than relying on them to
-     find the "Copy Embed Code" option. Anything that isn't a
-     poly.cam capture link is flagged with a clear reason instead of
-     silently failing.
+     Viewer supports two URL sources:
+
+     1. SuperSplat (PlayCanvas) — preferred for full Walk Mode.
+        Agent scans with Polycam (Space Mode / LiDAR), exports the
+        .ply file, uploads to superspl.at, and pastes the resulting
+        scene URL: https://superspl.at/scene/<id>/studio
+        These are used as-is — SuperSplat handles its own embedding.
+
+     2. Polycam (legacy) — orbit/drag only, no walk controls.
+        Capture link auto-normalized to /embed format.
+        https://poly.cam/capture/<id>  →  https://poly.cam/capture/<id>/embed
+
+     Anything else is rejected with a clear reason message.
      ========================================================= */
   const splatEmbed = document.getElementById('splatEmbed');
   const viewerLoading = document.getElementById('viewerLoading');
@@ -619,34 +631,52 @@
   const viewerErrorDetail = document.getElementById('viewerErrorDetail');
   const viewerSourceLabel = document.getElementById('viewerSourceLabel');
 
-  // Validates a Polycam capture link and normalizes it to the
-  // embeddable /embed URL shape. Returns { ok:true, url } or
+  // Validates a 3D viewer URL and normalizes it to its embeddable form.
+  // Accepts SuperSplat scene URLs (preferred, Walk Mode enabled) and
+  // legacy Polycam capture links. Returns { ok:true, url, source } or
   // { ok:false, reason }.
   function resolveEmbedUrl(raw){
     if(!raw || typeof raw !== 'string' || raw.trim() === ''){
-      return { ok:false, reason:'No Polycam capture link has been added for this listing yet.' };
+      return { ok:false, reason:'No 3D tour link has been added for this listing yet.' };
     }
     const url = raw.trim();
     if(url.indexOf('REPLACE-WITH') !== -1){
-      return { ok:false, reason:'This listing is using a placeholder capture link — paste the real Polycam link in the intake form.' };
+      return { ok:false, reason:'This listing is using a placeholder link — paste the real SuperSplat or Polycam link in the intake form.' };
     }
 
     let parsed;
     try{ parsed = new URL(url); }
-    catch(err){ return { ok:false, reason:'That capture link doesn\'t look like a valid URL.' }; }
+    catch(err){ return { ok:false, reason:'That link doesn\'t look like a valid URL.' }; }
 
-    const host = parsed.hostname.replace(/^www\./,'');
-    if(host !== 'poly.cam' && host !== 'polycam.com'){
-      return { ok:false, reason:`"${host}" isn't a Polycam link — paste the capture link from poly.cam.` };
+    const host = parsed.hostname.replace(/^www\./, '');
+
+    // ── SuperSplat (PlayCanvas) ──────────────────────────────────
+    // Expected shape: https://superspl.at/scene/<id>
+    // or:             https://superspl.at/scene/<id>/studio
+    // Both work as iframe src — we normalise to the /studio variant
+    // which shows the full viewer toolbar including Walk Mode toggle.
+    if(host === 'superspl.at'){
+      const sceneMatch = parsed.pathname.match(/^\/scene\/([a-zA-Z0-9_-]+)/);
+      if(!sceneMatch){
+        return { ok:false, reason:'That SuperSplat link isn\'t in a recognized format. Use the scene URL from superspl.at/scene/...' };
+      }
+      const id = sceneMatch[1];
+      return { ok:true, url:`https://superspl.at/scene/${id}/studio`, source:'SuperSplat · Walk Mode' };
     }
 
-    const captureMatch = parsed.pathname.match(/^\/capture\/([a-zA-Z0-9-]+)/);
-    if(!captureMatch){
-      return { ok:false, reason:'That Polycam link isn\'t in a recognized format. Use the capture link from Polycam\'s share menu (poly.cam/capture/...).' };
+    // ── Polycam (legacy orbit viewer) ───────────────────────────
+    // Expected shape: https://poly.cam/capture/<id>
+    // Auto-appends /embed if missing.
+    if(host === 'poly.cam' || host === 'polycam.com'){
+      const captureMatch = parsed.pathname.match(/^\/capture\/([a-zA-Z0-9-]+)/);
+      if(!captureMatch){
+        return { ok:false, reason:'That Polycam link isn\'t in a recognized format. Use the capture link from Polycam\'s share menu (poly.cam/capture/...).' };
+      }
+      const id = captureMatch[1];
+      return { ok:true, url:`https://poly.cam/capture/${id}/embed`, source:'Live 3D Splat · Polycam' };
     }
 
-    const id = captureMatch[1];
-    return { ok:true, url:`https://poly.cam/capture/${id}/embed` };
+    return { ok:false, reason:`"${host}" isn't a supported 3D viewer link. Paste a SuperSplat scene URL (superspl.at) or a Polycam capture link (poly.cam).` };
   }
 
   function armViewerLoadingState(){
@@ -694,7 +724,7 @@
     }
     splatEmbed.style.visibility = 'visible';
     armViewerLoadingState();
-    viewerSourceLabel.textContent = 'Live 3D Splat · Polycam';
+    viewerSourceLabel.textContent = result.source || 'Live 3D Viewer';
     splatEmbed.src = result.url;
     arm6sFallback();
   }
