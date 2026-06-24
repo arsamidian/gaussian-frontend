@@ -616,7 +616,7 @@
      1. SuperSplat (PlayCanvas) — preferred for full Walk Mode.
         Agent scans with Polycam (Space Mode / LiDAR), exports the
         .ply file, uploads to superspl.at, and pastes the resulting
-        scene URL: https://superspl.at/scene/<id>/studio
+        scene URL: https://superspl.at/scene/<id>
         These are used as-is — SuperSplat handles its own embedding.
 
      2. Polycam (legacy) — orbit/drag only, no walk controls.
@@ -653,15 +653,15 @@
     // ── SuperSplat (PlayCanvas) ──────────────────────────────────
     // Expected shape: https://superspl.at/scene/<id>
     // or:             https://superspl.at/scene/<id>/studio
-    // Both work as iframe src — we normalise to the /studio variant
-    // which shows the full viewer toolbar including Walk Mode toggle.
+    // Normalise to the base scene URL — /studio is the editor view
+    // and returns 404 when embedded; the base URL is the public viewer.
     if(host === 'superspl.at'){
       const sceneMatch = parsed.pathname.match(/^\/scene\/([a-zA-Z0-9_-]+)/);
       if(!sceneMatch){
         return { ok:false, reason:'That SuperSplat link isn\'t in a recognized format. Use the scene URL from superspl.at/scene/...' };
       }
       const id = sceneMatch[1];
-      return { ok:true, url:`https://superspl.at/scene/${id}/studio`, source:'SuperSplat · Walk Mode' };
+      return { ok:true, url:`https://superspl.at/scene/${id}`, source:'SuperSplat · Walk Mode' };
     }
 
     // ── Polycam (legacy orbit viewer) ───────────────────────────
