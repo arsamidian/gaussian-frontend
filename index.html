@@ -111,7 +111,6 @@ function parseCSV(text){
   if(lines.length < 2) return [];
   const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g,'').toLowerCase());
   return lines.slice(1).map(line => {
-    // Handle quoted fields with commas inside
     const vals = []; let cur = ''; let inQ = false;
     for(let i=0;i<line.length;i++){
       const c = line[i];
@@ -161,7 +160,6 @@ function renderGrid(listings){
   const grid = document.getElementById('listingsGrid');
   grid.innerHTML = '';
 
-  // Set agent info from first listing
   const first = listings[0];
   if(first.agent_first||first.agent_last){
     const name = [first.agent_first,first.agent_last].filter(Boolean).join(' ');
@@ -229,7 +227,7 @@ async function loadListings(){
   document.getElementById('listingsGrid').classList.add('hidden');
 
   try{
-    // Use a CORS proxy since Google Sheets CSV doesn't set CORS headers for direct fetch
+    // Fetch directly — Google Sheets published CSVs support CORS
     const res = await fetch(SHEET_CSV);
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const text = await res.text();
