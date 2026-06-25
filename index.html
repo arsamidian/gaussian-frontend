@@ -431,15 +431,96 @@
   const hasListing = listing.address || listing.splat_url;
 
   /* =========================================================
-     SHOW/HIDE STATES
+     3D VIEWER
+     This block must be defined BEFORE initPortal() is called below —
+     initPortal() calls loadViewer() synchronously, and loadViewer()
+     reads these const-declared DOM references. const/let are not
+     hoisted the way function declarations are, so if this block sat
+     after the call site, every page load with a listing would throw
+     "Cannot access 'viewerLoading' before initialization" the
+     instant loadViewer() ran, silently aborting the rest of
+     initPortal() (budget calc, fit score, chat — everything after
+     the viewer call in source order would never execute).
      ========================================================= */
-  if(!hasListing){
-    document.getElementById('noListingState').classList.remove('hidden');
-  } else {
-    document.getElementById('propertyStrip').classList.remove('hidden');
-    document.getElementById('mainLayout').classList.remove('hidden');
-    initPortal();
+  const splatEmbed     = document.getElementById('splatEmbed');
+  const viewerLoading  = document.getElementById('viewerLoading');
+  const viewerError    = document.getElementById('viewerError');
+  const viewerErrorDetail = document.getElementById('viewerErrorDetail');
+  const viewerSourceLabel = document.getElementById('viewerSourceLabel');
+
+  function resolveEmbedUrl(raw){
+    if(!raw || !raw.trim()) return { ok:false, reason:'No 3D tour link was provided for this listing.' };
+    const url = raw.trim();
+    if(url.indexOf('REPLACE') !== -1) return { ok:false, reason:'This listing is using a placeholder link — the agent needs to paste the real SuperSplat or Polycam URL.' };
+
+    let parsed;
+    try{ parsed = new URL(url); } catch(e){ return { ok:false, reason:'That doesn\'t look like a valid URL.' }; }
+    const host = parsed.hostname.replace(/^www\./,'');
+
+    if(host === 'superspl.at'){
+      // The Studio editor link (.../scene/<id>/studio) is owner-only and
+      // 404s for anyone else — this is the single most common mistake
+      // when copying a SuperSplat link, since it's what shows in the
+      // address bar while editing. Catch it specifically so the error
+      // tells the agent exactly what to fix instead of just failing.
+      const studioMatch = parsed.pathname.match(/^\/scene\/([a-zA-Z0-9_-]+)\/studio\/?$/);
+      if(studioMatch){
+        return { ok:false, reason:'That\'s the Studio editing link, which only works for the splat\'s owner. Copy the public scene link instead — remove "/studio" from the end, or use the Embed button on the scene page.' };
+      }
+      // Public scene page: superspl.at/scene/<id> — this is directly
+      // iframe-embeddable per SuperSplat's own Embed feature, no URL
+      // rewriting needed.
+      const sceneMatch = parsed.pathname.match(/^\/scene\/([a-zA-Z0-9_-]+)\/?$/);
+      if(sceneMatch){
+        return { ok:true, url:`https://superspl.at/scene/${sceneMatch[1]}`, source:'SuperSplat' };
+      }
+      return { ok:false, reason:'That SuperSplat link isn\'t in a recognized format. Use the public scene link (superspl.at/scene/...), not the Editor or Studio link.' };
+    }
+
+    if(host === 'poly.cam' || host === 'polycam.com'){
+      const m = parsed.pathname.match(/^\/capture\/([a-zA-Z0-9-]+)/);
+      if(!m) return { ok:false, reason:'That Polycam link isn\'t in a recognized format. Use poly.cam/capture/...' };
+      return { ok:true, url:`https://poly.cam/capture/${m[1]}/embed`, source:'Live 3D Splat · Polycam' };
+    }
+
+    return { ok:false, reason:`"${host}" isn't a supported viewer. Use a SuperSplat scene URL or Polycam capture link.` };
   }
+
+  function loadViewer(rawUrl){
+    const result = resolveEmbedUrl(rawUrl);
+    if(!result.ok){
+      viewerError.style.display = 'flex';
+      viewerLoading.style.display = 'none';
+      viewerErrorDetail.textContent = result.reason;
+      splatEmbed.style.visibility = 'hidden';
+      return;
+    }
+    viewerError.style.display = 'none';
+    viewerLoading.style.display = 'flex';
+    viewerLoading.style.opacity = '1';
+    splatEmbed.style.visibility = 'visible';
+    viewerSourceLabel.textContent = result.source;
+    splatEmbed.src = result.url;
+    // Hide loading overlay — cross-origin iframes don't always fire
+    // load reliably, so we use a short fallback timer as the safety net.
+    const hideLoading = () => {
+      viewerLoading.style.opacity = '0';
+      setTimeout(() => { viewerLoading.style.display = 'none'; }, 500);
+    };
+    const timer = setTimeout(hideLoading, 3000);
+    splatEmbed.addEventListener('load', function onLoad(){
+      clearTimeout(timer);
+      hideLoading();
+      splatEmbed.removeEventListener('load', onLoad);
+    });
+  }
+
+  // NOTE: the show/hide state check + initPortal() call has been moved
+  // to the very end of this script (just before the closing IIFE), so
+  // that every const/function this code depends on — clientProfile,
+  // homeAttrs, chatBody, chatScript, requestModal, etc. — has already
+  // been declared by the time initPortal() actually runs. See the
+  // bottom of this script for the real call site.
 
   function initPortal(){
 
@@ -523,82 +604,6 @@
     updateCompleteness();
     updateChatProgressLabel();
     advanceChat();
-  }
-
-  /* =========================================================
-     3D VIEWER
-     ========================================================= */
-  const splatEmbed     = document.getElementById('splatEmbed');
-  const viewerLoading  = document.getElementById('viewerLoading');
-  const viewerError    = document.getElementById('viewerError');
-  const viewerErrorDetail = document.getElementById('viewerErrorDetail');
-  const viewerSourceLabel = document.getElementById('viewerSourceLabel');
-
-  function resolveEmbedUrl(raw){
-    if(!raw || !raw.trim()) return { ok:false, reason:'No 3D tour link was provided for this listing.' };
-    const url = raw.trim();
-    if(url.indexOf('REPLACE') !== -1) return { ok:false, reason:'This listing is using a placeholder link — the agent needs to paste the real SuperSplat or Polycam URL.' };
-
-    let parsed;
-    try{ parsed = new URL(url); } catch(e){ return { ok:false, reason:'That doesn\'t look like a valid URL.' }; }
-    const host = parsed.hostname.replace(/^www\./,'');
-
-    if(host === 'superspl.at'){
-      // The Studio editor link (.../scene/<id>/studio) is owner-only and
-      // 404s for anyone else — this is the single most common mistake
-      // when copying a SuperSplat link, since it's what shows in the
-      // address bar while editing. Catch it specifically so the error
-      // tells the agent exactly what to fix instead of just failing.
-      const studioMatch = parsed.pathname.match(/^\/scene\/([a-zA-Z0-9_-]+)\/studio\/?$/);
-      if(studioMatch){
-        return { ok:false, reason:'That\'s the Studio editing link, which only works for the splat\'s owner. Copy the public scene link instead — remove "/studio" from the end, or use the Embed button on the scene page.' };
-      }
-      // Public scene page: superspl.at/scene/<id> — this is directly
-      // iframe-embeddable per SuperSplat's own Embed feature, no URL
-      // rewriting needed.
-      const sceneMatch = parsed.pathname.match(/^\/scene\/([a-zA-Z0-9_-]+)\/?$/);
-      if(sceneMatch){
-        return { ok:true, url:`https://superspl.at/scene/${sceneMatch[1]}`, source:'SuperSplat' };
-      }
-      return { ok:false, reason:'That SuperSplat link isn\'t in a recognized format. Use the public scene link (superspl.at/scene/...), not the Editor or Studio link.' };
-    }
-
-    if(host === 'poly.cam' || host === 'polycam.com'){
-      const m = parsed.pathname.match(/^\/capture\/([a-zA-Z0-9-]+)/);
-      if(!m) return { ok:false, reason:'That Polycam link isn\'t in a recognized format. Use poly.cam/capture/...' };
-      return { ok:true, url:`https://poly.cam/capture/${m[1]}/embed`, source:'Live 3D Splat · Polycam' };
-    }
-
-    return { ok:false, reason:`"${host}" isn't a supported viewer. Use a SuperSplat scene URL or Polycam capture link.` };
-  }
-
-  function loadViewer(rawUrl){
-    const result = resolveEmbedUrl(rawUrl);
-    if(!result.ok){
-      viewerError.style.display = 'flex';
-      viewerLoading.style.display = 'none';
-      viewerErrorDetail.textContent = result.reason;
-      splatEmbed.style.visibility = 'hidden';
-      return;
-    }
-    viewerError.style.display = 'none';
-    viewerLoading.style.display = 'flex';
-    viewerLoading.style.opacity = '1';
-    splatEmbed.style.visibility = 'visible';
-    viewerSourceLabel.textContent = result.source;
-    splatEmbed.src = result.url;
-    // Hide loading overlay — cross-origin iframes don't always fire
-    // load reliably, so we use a short fallback timer as the safety net.
-    const hideLoading = () => {
-      viewerLoading.style.opacity = '0';
-      setTimeout(() => { viewerLoading.style.display = 'none'; }, 500);
-    };
-    const timer = setTimeout(hideLoading, 3000);
-    splatEmbed.addEventListener('load', function onLoad(){
-      clearTimeout(timer);
-      hideLoading();
-      splatEmbed.removeEventListener('load', onLoad);
-    });
   }
 
   /* =========================================================
@@ -853,6 +858,21 @@
     toast.classList.add('opacity-100');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(()=>{ toast.classList.add('opacity-0','pointer-events-none'); toast.classList.remove('opacity-100'); },3200);
+  }
+
+  /* =========================================================
+     SHOW/HIDE STATES — runs last, after every const/function above
+     (clientProfile, homeAttrs, chatBody, chatScript, requestModal,
+     splatEmbed, etc.) has been declared, so initPortal() can safely
+     call into all of them without hitting a "Cannot access before
+     initialization" error.
+     ========================================================= */
+  if(!hasListing){
+    document.getElementById('noListingState').classList.remove('hidden');
+  } else {
+    document.getElementById('propertyStrip').classList.remove('hidden');
+    document.getElementById('mainLayout').classList.remove('hidden');
+    initPortal();
   }
 
 })();
