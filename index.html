@@ -465,16 +465,23 @@
       // tells the agent exactly what to fix instead of just failing.
       const studioMatch = parsed.pathname.match(/^\/scene\/([a-zA-Z0-9_-]+)\/studio\/?$/);
       if(studioMatch){
-        return { ok:false, reason:'That\'s the Studio editing link, which only works for the splat\'s owner. Copy the public scene link instead — remove "/studio" from the end, or use the Embed button on the scene page.' };
+        return { ok:false, reason:'That\'s the Studio editing link, which only works for the splat\'s owner. Use the "Embed" button on the scene page instead and paste that link.' };
       }
-      // Public scene page: superspl.at/scene/<id> — this is directly
-      // iframe-embeddable per SuperSplat's own Embed feature, no URL
-      // rewriting needed.
+      // The real embed link, confirmed directly from SuperSplat's own
+      // "Embed" button output: https://superspl.at/s?id=<hash> — this
+      // is the clean player with no SuperSplat site chrome, and is
+      // what agents should be pasting. Accept it as-is.
+      if(parsed.pathname === '/s' && parsed.searchParams.get('id')){
+        return { ok:true, url:`https://superspl.at/s?id=${parsed.searchParams.get('id')}`, source:'SuperSplat' };
+      }
+      // Fallback: the public scene page link (superspl.at/scene/<id>),
+      // in case an agent pastes that instead of using the Embed button.
+      // Same hash, so we can still normalize it to the clean embed URL.
       const sceneMatch = parsed.pathname.match(/^\/scene\/([a-zA-Z0-9_-]+)\/?$/);
       if(sceneMatch){
-        return { ok:true, url:`https://superspl.at/scene/${sceneMatch[1]}`, source:'SuperSplat' };
+        return { ok:true, url:`https://superspl.at/s?id=${sceneMatch[1]}`, source:'SuperSplat' };
       }
-      return { ok:false, reason:'That SuperSplat link isn\'t in a recognized format. Use the public scene link (superspl.at/scene/...), not the Editor or Studio link.' };
+      return { ok:false, reason:'That SuperSplat link isn\'t in a recognized format. Use the "Embed" button on the scene page and paste that link.' };
     }
 
     if(host === 'poly.cam' || host === 'polycam.com'){
