@@ -230,8 +230,7 @@ async function loadListings(){
 
   try{
     // Use a CORS proxy since Google Sheets CSV doesn't set CORS headers for direct fetch
-    const url = `https://corsproxy.io/?${encodeURIComponent(SHEET_CSV)}`;
-    const res  = await fetch(url);
+    const res = await fetch(SHEET_CSV);
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const text = await res.text();
     const listings = parseCSV(text);
