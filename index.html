@@ -508,7 +508,7 @@
       labelEl.textContent = 'Full listing not provided';
     }
 
-    /* --- Budget pre-fill from listing price --- */
+    /* --- Budget pre-fill from listing price — must happen before recalcBudget() --- */
     if(priceNum){
       document.getElementById('purchasePrice').value = priceNum;
     }
@@ -516,7 +516,7 @@
     /* --- 3D Viewer --- */
     loadViewer(listing.splat_url);
 
-    /* --- Everything else --- */
+    /* --- Init all panels now that DOM values are set --- */
     recalcBudget();
     updateFitRing();
     updateBrief();
@@ -578,11 +578,16 @@
     splatEmbed.style.visibility = 'visible';
     viewerSourceLabel.textContent = result.source;
     splatEmbed.src = result.url;
-    const timer = setTimeout(() => { viewerLoading.style.opacity='0'; setTimeout(()=>{ viewerLoading.style.display='none'; },500); }, 6000);
-    splatEmbed.addEventListener('load', function onLoad(){
-      clearTimeout(timer);
+    // Hide loading overlay — cross-origin iframes don't always fire
+    // load reliably, so we use a short fallback timer as the safety net.
+    const hideLoading = () => {
       viewerLoading.style.opacity = '0';
       setTimeout(() => { viewerLoading.style.display = 'none'; }, 500);
+    };
+    const timer = setTimeout(hideLoading, 3000);
+    splatEmbed.addEventListener('load', function onLoad(){
+      clearTimeout(timer);
+      hideLoading();
       splatEmbed.removeEventListener('load', onLoad);
     });
   }
