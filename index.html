@@ -49,7 +49,6 @@
   .viewer-frame iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
   .viewer-loading{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.75rem; background:#0A0A0C; transition:opacity .5s ease; }
   .viewer-error{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.5rem; background:#0A0A0C; padding:1.5rem; text-align:center; z-index:5; }
-  /* No-listing state */
   .no-listing{ min-height:60vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:1rem; padding:3rem; }
   @media (prefers-reduced-motion:reduce){ .scanline::after,.pulse-dot,.card-rise,.match-ring circle{ animation:none !important; transition:none !important; } }
 </style>
@@ -83,7 +82,7 @@
   </div>
 </header>
 
-<!-- NO LISTING STATE (shown when no URL params present) -->
+<!-- NO LISTING STATE -->
 <div id="noListingState" class="no-listing hidden">
   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" class="opacity-40">
     <circle cx="12" cy="12" r="9.2" stroke="#C9A368" stroke-width="1.4"/>
@@ -163,7 +162,7 @@
           <span class="font-ui text-[10.5px] font-medium text-white tracking-wide" id="viewerSourceLabel">Live 3D Splat</span>
         </span>
         <div class="absolute top-3 right-3 bg-black/55 backdrop-blur-md border border-white/15 rounded-full w-12 h-12 flex items-center justify-center z-10">
-          <svg class="match-ring" id="fitRing" width="48" height="48" viewBox="0 0 48 48">
+          <svg class="match-ring" width="48" height="48" viewBox="0 0 48 48">
             <circle cx="24" cy="24" r="19" stroke="#2A2A30" stroke-width="3.5" fill="none"/>
             <circle cx="24" cy="24" r="19" stroke="var(--gold)" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-dasharray="119.4" stroke-dashoffset="119.4" id="fitRingProgress"/>
           </svg>
@@ -182,45 +181,23 @@
         </a>
       </div>
 
-      <!-- CTA -->
       <button id="goldenCtaBtn" class="w-full font-ui text-[17px] sm:text-[18px] font-bold bg-[var(--gold)] text-black rounded-2xl py-5 hover:bg-[var(--gold-soft)] transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-3 focus-gold shadow-[0_8px_32px_-8px_rgba(201,163,104,0.5)]">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
         Ready to check it out? Request Info!
       </button>
 
-      <!-- Property facts -->
       <div class="bg-[var(--panel)] border border-[var(--hair)] rounded-2xl p-5 grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div>
-          <p class="font-mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--bone-dim)] mb-1">Beds / Baths</p>
-          <p class="font-display text-[18px]" id="factBeds">—</p>
-        </div>
-        <div>
-          <p class="font-mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--bone-dim)] mb-1">Square Feet</p>
-          <p class="font-display text-[18px]" id="factSqft">—</p>
-        </div>
-        <div>
-          <p class="font-mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--bone-dim)] mb-1">Type</p>
-          <p class="font-display text-[18px]" id="factType">—</p>
-        </div>
-        <div>
-          <p class="font-mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--bone-dim)] mb-1">Lot / Land</p>
-          <p class="font-display text-[18px]" id="factLot">—</p>
-        </div>
+        <div><p class="font-mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--bone-dim)] mb-1">Beds / Baths</p><p class="font-display text-[18px]" id="factBeds">—</p></div>
+        <div><p class="font-mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--bone-dim)] mb-1">Square Feet</p><p class="font-display text-[18px]" id="factSqft">—</p></div>
+        <div><p class="font-mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--bone-dim)] mb-1">Type</p><p class="font-display text-[18px]" id="factType">—</p></div>
+        <div><p class="font-mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--bone-dim)] mb-1">Lot / Land</p><p class="font-display text-[18px]" id="factLot">—</p></div>
       </div>
 
       <p class="font-ui text-[13px] leading-relaxed text-[var(--bone-dim)] px-1" id="propertyDescription"></p>
-
-      <!-- Additional listings -->
-      <div id="additionalListingsWrap" class="pt-2 hidden">
-        <p class="font-ui text-[11px] tracking-[0.18em] uppercase text-[var(--gold)] mb-3" id="additionalListingsLabel"></p>
-        <div class="space-y-3" id="additionalListings"></div>
-      </div>
     </div>
 
     <!-- RIGHT: DISCOVERY PANEL -->
     <aside class="lg:col-span-2 lg:sticky lg:top-24 space-y-4">
-
-      <!-- Lifestyle Priorities -->
       <div class="bg-[var(--panel)] border border-[var(--hair)] rounded-2xl p-6">
         <div class="flex items-center gap-2 mb-1">
           <span class="w-1.5 h-1.5 rounded-full bg-[var(--signal)] pulse-dot"></span>
@@ -229,51 +206,11 @@
         <h3 class="font-display text-[20px] mb-1">Lifestyle Priorities</h3>
         <p class="font-ui text-[12.5px] text-[var(--bone-dim)] mb-5">Weight what matters — this home's fit score updates live.</p>
         <div class="space-y-4">
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <span class="font-ui text-[13px] text-[var(--bone-dim)] flex items-center gap-1.5">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M3 12h4l3-9 4 18 3-9h4" stroke="#C9A368" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Commute
-              </span>
-              <span class="font-mono text-[11.5px] text-[var(--gold)] font-medium" id="val-commute">70%</span>
-            </div>
-            <input type="range" min="0" max="100" value="70" id="slider-commute">
-          </div>
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <span class="font-ui text-[13px] text-[var(--bone-dim)] flex items-center gap-1.5">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="9" width="18" height="11" rx="1" stroke="#C9A368" stroke-width="1.6"/><path d="M9 9V5a3 3 0 0 1 6 0v4" stroke="#C9A368" stroke-width="1.6"/></svg>Space &amp; Layout
-              </span>
-              <span class="font-mono text-[11.5px] text-[var(--gold)] font-medium" id="val-space">55%</span>
-            </div>
-            <input type="range" min="0" max="100" value="55" id="slider-space">
-          </div>
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <span class="font-ui text-[13px] text-[var(--bone-dim)] flex items-center gap-1.5">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 2 2 9l10 13L22 9z" stroke="#C9A368" stroke-width="1.6" stroke-linejoin="round"/></svg>School District
-              </span>
-              <span class="font-mono text-[11.5px] text-[var(--gold)] font-medium" id="val-school">30%</span>
-            </div>
-            <input type="range" min="0" max="100" value="30" id="slider-school">
-          </div>
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <span class="font-ui text-[13px] text-[var(--bone-dim)] flex items-center gap-1.5">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#C9A368" stroke-width="1.6"/><path d="M12 7v5l3 3" stroke="#C9A368" stroke-width="1.6" stroke-linecap="round"/></svg>Walkability
-              </span>
-              <span class="font-mono text-[11.5px] text-[var(--gold)] font-medium" id="val-walk">45%</span>
-            </div>
-            <input type="range" min="0" max="100" value="45" id="slider-walk">
-          </div>
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <span class="font-ui text-[13px] text-[var(--bone-dim)] flex items-center gap-1.5">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M3 21V8l9-5 9 5v13" stroke="#C9A368" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 21v-7h6v7" stroke="#C9A368" stroke-width="1.6"/></svg>Privacy &amp; Yard
-              </span>
-              <span class="font-mono text-[11.5px] text-[var(--gold)] font-medium" id="val-privacy">60%</span>
-            </div>
-            <input type="range" min="0" max="100" value="60" id="slider-privacy">
-          </div>
+          <div><div class="flex items-center justify-between mb-2"><span class="font-ui text-[13px] text-[var(--bone-dim)] flex items-center gap-1.5"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M3 12h4l3-9 4 18 3-9h4" stroke="#C9A368" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Commute</span><span class="font-mono text-[11.5px] text-[var(--gold)] font-medium" id="val-commute">70%</span></div><input type="range" min="0" max="100" value="70" id="slider-commute"></div>
+          <div><div class="flex items-center justify-between mb-2"><span class="font-ui text-[13px] text-[var(--bone-dim)] flex items-center gap-1.5"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="9" width="18" height="11" rx="1" stroke="#C9A368" stroke-width="1.6"/><path d="M9 9V5a3 3 0 0 1 6 0v4" stroke="#C9A368" stroke-width="1.6"/></svg>Space &amp; Layout</span><span class="font-mono text-[11.5px] text-[var(--gold)] font-medium" id="val-space">55%</span></div><input type="range" min="0" max="100" value="55" id="slider-space"></div>
+          <div><div class="flex items-center justify-between mb-2"><span class="font-ui text-[13px] text-[var(--bone-dim)] flex items-center gap-1.5"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 2 2 9l10 13L22 9z" stroke="#C9A368" stroke-width="1.6" stroke-linejoin="round"/></svg>School District</span><span class="font-mono text-[11.5px] text-[var(--gold)] font-medium" id="val-school">30%</span></div><input type="range" min="0" max="100" value="30" id="slider-school"></div>
+          <div><div class="flex items-center justify-between mb-2"><span class="font-ui text-[13px] text-[var(--bone-dim)] flex items-center gap-1.5"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#C9A368" stroke-width="1.6"/><path d="M12 7v5l3 3" stroke="#C9A368" stroke-width="1.6" stroke-linecap="round"/></svg>Walkability</span><span class="font-mono text-[11.5px] text-[var(--gold)] font-medium" id="val-walk">45%</span></div><input type="range" min="0" max="100" value="45" id="slider-walk"></div>
+          <div><div class="flex items-center justify-between mb-2"><span class="font-ui text-[13px] text-[var(--bone-dim)] flex items-center gap-1.5"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M3 21V8l9-5 9 5v13" stroke="#C9A368" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 21v-7h6v7" stroke="#C9A368" stroke-width="1.6"/></svg>Privacy &amp; Yard</span><span class="font-mono text-[11.5px] text-[var(--gold)] font-medium" id="val-privacy">60%</span></div><input type="range" min="0" max="100" value="60" id="slider-privacy"></div>
         </div>
         <div class="flex flex-wrap gap-1.5 mt-5 pt-5 border-t border-[var(--hair)]">
           <span class="font-ui text-[11px] text-[var(--bone-dim)] mr-1 pt-1.5">Anchor:</span>
@@ -285,7 +222,6 @@
         </div>
       </div>
 
-      <!-- Budget Calculator -->
       <div class="bg-[var(--panel)] border border-[var(--hair)] rounded-2xl p-6">
         <div class="flex items-center gap-2 mb-1">
           <span class="w-1.5 h-1.5 rounded-full bg-[var(--signal)] pulse-dot"></span>
@@ -294,28 +230,13 @@
         <h3 class="font-display text-[20px] mb-1">All-In Budget Calculator</h3>
         <p class="font-ui text-[12.5px] text-[var(--bone-dim)] mb-5">Your true monthly carrying cost on this specific home.</p>
         <div class="grid grid-cols-2 gap-2.5 mb-4">
-          <div>
-            <label class="font-mono text-[10px] uppercase tracking-wide text-[var(--bone-dim)] block mb-1.5">Purchase price</label>
-            <input type="text" id="purchasePrice" value="" inputmode="numeric" class="w-full bg-[var(--ink)] border border-[var(--hair)] focus:border-[var(--gold)]/70 rounded-lg px-3 py-2 font-mono text-[12.5px] text-[var(--bone)] outline-none transition-colors focus-gold">
-          </div>
-          <div>
-            <label class="font-mono text-[10px] uppercase tracking-wide text-[var(--bone-dim)] block mb-1.5">Down payment %</label>
-            <input type="text" id="downPayment" value="20" inputmode="numeric" class="w-full bg-[var(--ink)] border border-[var(--hair)] focus:border-[var(--gold)]/70 rounded-lg px-3 py-2 font-mono text-[12.5px] text-[var(--bone)] outline-none transition-colors focus-gold">
-          </div>
-          <div>
-            <label class="font-mono text-[10px] uppercase tracking-wide text-[var(--bone-dim)] block mb-1.5">Rate %</label>
-            <input type="text" id="rate" value="4.9" inputmode="decimal" class="w-full bg-[var(--ink)] border border-[var(--hair)] focus:border-[var(--gold)]/70 rounded-lg px-3 py-2 font-mono text-[12.5px] text-[var(--bone)] outline-none transition-colors focus-gold">
-          </div>
-          <div>
-            <label class="font-mono text-[10px] uppercase tracking-wide text-[var(--bone-dim)] block mb-1.5">Condo fees / mo</label>
-            <input type="text" id="condoFees" value="0" inputmode="numeric" class="w-full bg-[var(--ink)] border border-[var(--hair)] focus:border-[var(--gold)]/70 rounded-lg px-3 py-2 font-mono text-[12.5px] text-[var(--bone)] outline-none transition-colors focus-gold">
-          </div>
+          <div><label class="font-mono text-[10px] uppercase tracking-wide text-[var(--bone-dim)] block mb-1.5">Purchase price</label><input type="text" id="purchasePrice" value="" inputmode="numeric" class="w-full bg-[var(--ink)] border border-[var(--hair)] focus:border-[var(--gold)]/70 rounded-lg px-3 py-2 font-mono text-[12.5px] text-[var(--bone)] outline-none transition-colors focus-gold"></div>
+          <div><label class="font-mono text-[10px] uppercase tracking-wide text-[var(--bone-dim)] block mb-1.5">Down payment %</label><input type="text" id="downPayment" value="20" inputmode="numeric" class="w-full bg-[var(--ink)] border border-[var(--hair)] focus:border-[var(--gold)]/70 rounded-lg px-3 py-2 font-mono text-[12.5px] text-[var(--bone)] outline-none transition-colors focus-gold"></div>
+          <div><label class="font-mono text-[10px] uppercase tracking-wide text-[var(--bone-dim)] block mb-1.5">Rate %</label><input type="text" id="rate" value="4.9" inputmode="decimal" class="w-full bg-[var(--ink)] border border-[var(--hair)] focus:border-[var(--gold)]/70 rounded-lg px-3 py-2 font-mono text-[12.5px] text-[var(--bone)] outline-none transition-colors focus-gold"></div>
+          <div><label class="font-mono text-[10px] uppercase tracking-wide text-[var(--bone-dim)] block mb-1.5">Condo fees / mo</label><input type="text" id="condoFees" value="0" inputmode="numeric" class="w-full bg-[var(--ink)] border border-[var(--hair)] focus:border-[var(--gold)]/70 rounded-lg px-3 py-2 font-mono text-[12.5px] text-[var(--bone)] outline-none transition-colors focus-gold"></div>
         </div>
         <div class="bg-[var(--panel-soft)] border border-[var(--hair)] rounded-xl p-4">
-          <div class="flex items-baseline gap-1.5">
-            <span class="font-display text-[26px] text-[var(--bone)]" id="budgetTotal">$—</span>
-            <span class="font-mono text-[11px] text-[var(--bone-dim)]">/ month all-in</span>
-          </div>
+          <div class="flex items-baseline gap-1.5"><span class="font-display text-[26px] text-[var(--bone)]" id="budgetTotal">$—</span><span class="font-mono text-[11px] text-[var(--bone-dim)]">/ month all-in</span></div>
           <p class="font-ui text-[11px] text-[var(--bone-dim)] mb-3">Mortgage · property tax · insurance estimate</p>
           <div class="space-y-1.5 font-ui text-[12px]">
             <div class="flex items-center justify-between"><span class="text-[var(--bone-dim)] flex items-center gap-1.5"><span class="w-2 h-2 rounded-sm" style="background:#C9A368;"></span>Mortgage (P&amp;I)</span><span class="font-mono text-[var(--bone)]" id="bdMortgage">$—</span></div>
@@ -333,7 +254,6 @@
         </div>
       </div>
 
-      <!-- Synthesized Brief -->
       <div class="bg-[var(--panel)] border border-[var(--hair)] rounded-2xl p-6">
         <p class="font-ui text-[11px] tracking-[0.18em] uppercase text-[var(--gold)] mb-3" id="briefLabel">Synthesized for your agent</p>
         <div class="bg-[var(--ink)] border border-[var(--hair)] rounded-xl p-4 font-mono text-[11.5px] leading-relaxed text-[var(--bone-dim)] max-h-[200px] overflow-y-auto whitespace-pre-wrap" id="briefBox">Building client brief…</div>
@@ -343,7 +263,7 @@
   </div>
 </main>
 
-<!-- REQUEST INFO MODAL -->
+<!-- REQUEST INFO MODAL — GHL form injected dynamically on open to prevent form_embed.js from crashing page load -->
 <div id="requestModal" class="fixed inset-0 z-50 hidden items-center justify-center p-6 bg-black/70 backdrop-blur-sm">
   <div class="bg-[var(--panel)] border border-[var(--hair)] rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto relative fade-in">
     <div class="flex items-start justify-between p-6 pb-4 border-b border-[var(--hair)]">
@@ -360,8 +280,337 @@
         <p class="font-mono text-[9.5px] uppercase tracking-[0.1em] text-[var(--gold)] mb-2">client_intent_summary →</p>
         <p id="summaryPreviewText" class="font-mono text-[11px] leading-relaxed text-[var(--bone-dim)] max-h-[150px] overflow-y-auto whitespace-pre-wrap">Building summary…</p>
       </div>
-      <iframe
-        src="https://api.leadconnectorhq.com/widget/form/I0W15bpSf2WEndcCGuQ2"
+      <!-- GHL iframe + script are injected here dynamically when the modal opens -->
+      <div id="ghlFormContainer"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[var(--panel)] border border-[var(--gold)] text-[var(--bone)] px-5 py-3.5 rounded-xl font-ui text-[13px] font-medium flex items-center gap-2.5 z-[60] opacity-0 pointer-events-none transition-all duration-300 shadow-2xl">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C9A368" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+  <span id="toastText">Done.</span>
+</div>
+
+<script>
+(function(){
+
+  /* =========================================================
+     URL PARAMS — everything the portal needs comes from GHL redirect
+     GHL Redirect URL template:
+     https://arsamidian.github.io/gaussian-frontend/
+       ?splat_url={{contact.3d_tour_url}}
+       &listing_url={{contact.mls_listing_url}}
+       &address={{contact.property_address}}
+       &neighbourhood={{contact.neighbourhood}}
+       &price={{contact.price}}
+       &beds={{contact.bedrooms}}
+       &baths={{contact.bathrooms}}
+       &sqft={{contact.square_feet}}
+       &lot={{contact.land_size}}
+       &type={{contact.property_type}}
+       &description={{contact.property_description}}
+       &agent_first={{contact.first_name}}
+       &agent_last={{contact.last_name}}
+       &agent_company={{contact.agent_company}}
+     ========================================================= */
+  const p = new URLSearchParams(window.location.search);
+  const listing = {
+    splat_url:     p.get('splat_url')     || '',
+    listing_url:   p.get('listing_url')   || '',
+    address:       p.get('address')       || '',
+    neighbourhood: p.get('neighbourhood') || '',
+    price:         p.get('price')         || '',
+    beds:          p.get('beds')          || '',
+    baths:         p.get('baths')         || '',
+    sqft:          p.get('sqft')          || '',
+    lot:           p.get('lot')           || '',
+    type:          p.get('type')          || '',
+    description:   p.get('description')  || '',
+    agent_first:   p.get('agent_first')  || '',
+    agent_last:    p.get('agent_last')   || '',
+    agent_company: p.get('agent_company')|| '',
+  };
+  const hasListing = !!(listing.address || listing.splat_url);
+
+  /* =========================================================
+     3D VIEWER — defined first so initPortal() can call loadViewer()
+     ========================================================= */
+  const splatEmbed        = document.getElementById('splatEmbed');
+  const viewerLoading     = document.getElementById('viewerLoading');
+  const viewerError       = document.getElementById('viewerError');
+  const viewerErrorDetail = document.getElementById('viewerErrorDetail');
+  const viewerSourceLabel = document.getElementById('viewerSourceLabel');
+
+  function resolveEmbedUrl(raw){
+    if(!raw || !raw.trim()) return { ok:false, reason:'No 3D tour link was provided for this listing.' };
+    let url = raw.trim();
+
+    // If agent accidentally pasted a full <iframe ...> snippet, pull the src out
+    const iframeSrcMatch = url.match(/src=["']([^"']+)["']/i);
+    if(iframeSrcMatch) url = iframeSrcMatch[1];
+
+    if(url.indexOf('REPLACE') !== -1)
+      return { ok:false, reason:'This listing still has a placeholder link — the agent needs to paste the real SuperSplat or Polycam URL.' };
+
+    let parsed;
+    try{ parsed = new URL(url); }
+    catch(e){ return { ok:false, reason:"That doesn't look like a valid URL." }; }
+    const host = parsed.hostname.replace(/^www\./,'');
+
+    /* ── SuperSplat ──────────────────────────────────────── */
+    if(host === 'superspl.at'){
+      // Clean embed URL: superspl.at/s?id=<hash>  ← what the Embed button gives
+      if(parsed.pathname === '/s' && parsed.searchParams.get('id'))
+        return { ok:true, url:`https://superspl.at/s?id=${parsed.searchParams.get('id')}`, source:'SuperSplat · Walk Mode' };
+
+      // Public scene page: superspl.at/scene/<id>  ← normalise to embed
+      const sceneOnly = parsed.pathname.match(/^\/scene\/([a-zA-Z0-9_-]+)\/?$/);
+      if(sceneOnly)
+        return { ok:true, url:`https://superspl.at/s?id=${sceneOnly[1]}`, source:'SuperSplat · Walk Mode' };
+
+      // Studio editor link: superspl.at/scene/<id>/studio  ← owner-only, normalise anyway
+      const studioMatch = parsed.pathname.match(/^\/scene\/([a-zA-Z0-9_-]+)\/studio\/?$/);
+      if(studioMatch)
+        return { ok:true, url:`https://superspl.at/s?id=${studioMatch[1]}`, source:'SuperSplat · Walk Mode' };
+
+      return { ok:false, reason:"That SuperSplat link isn't in a recognized format. Use the Embed button on the scene page." };
+    }
+
+    /* ── Polycam ─────────────────────────────────────────── */
+    if(host === 'poly.cam' || host === 'polycam.com'){
+      const m = parsed.pathname.match(/^\/capture\/([a-zA-Z0-9-]+)/);
+      if(!m) return { ok:false, reason:"That Polycam link isn't in a recognized format. Use poly.cam/capture/..." };
+      return { ok:true, url:`https://poly.cam/capture/${m[1]}/embed`, source:'Live 3D Splat · Polycam' };
+    }
+
+    return { ok:false, reason:`"${host}" isn't a supported viewer. Use a SuperSplat scene URL (superspl.at) or Polycam capture link (poly.cam).` };
+  }
+
+  function loadViewer(rawUrl){
+    const result = resolveEmbedUrl(rawUrl);
+    if(!result.ok){
+      viewerLoading.style.display = 'none';
+      viewerError.style.display = 'flex';
+      viewerErrorDetail.textContent = result.reason;
+      splatEmbed.style.visibility = 'hidden';
+      return;
+    }
+    viewerError.style.display = 'none';
+    viewerLoading.style.display = 'flex';
+    viewerLoading.style.opacity = '1';
+    splatEmbed.style.visibility = 'visible';
+    viewerSourceLabel.textContent = result.source;
+    splatEmbed.src = result.url;
+    const hideLoading = () => {
+      viewerLoading.style.opacity = '0';
+      setTimeout(() => { viewerLoading.style.display = 'none'; }, 500);
+    };
+    const t = setTimeout(hideLoading, 3500);
+    splatEmbed.addEventListener('load', function onLoad(){
+      clearTimeout(t); hideLoading();
+      splatEmbed.removeEventListener('load', onLoad);
+    });
+  }
+
+  /* =========================================================
+     CLIENT PROFILE STATE
+     ========================================================= */
+  const clientProfile = {
+    lifestyle:{ commute:70, space:55, school:30, walk:45, privacy:60 },
+    commuteTarget: null,
+    budget:{ price:0, downPct:20, rate:4.9, condo:0, allIn:0 },
+    notes:[], chatAnswers:{}
+  };
+  function fmtMoney(n){ return '$' + Math.round(n).toLocaleString('en-US'); }
+
+  /* =========================================================
+     FIT SCORE
+     ========================================================= */
+  const homeAttrs = { commute:55, space:85, school:75, walk:40, privacy:80 };
+  function computeFit(){
+    const w = clientProfile.lifestyle;
+    const total = w.commute+w.space+w.school+w.walk+w.privacy || 1;
+    return Math.round((homeAttrs.commute*w.commute+homeAttrs.space*w.space+homeAttrs.school*w.school+homeAttrs.walk*w.walk+homeAttrs.privacy*w.privacy)/total);
+  }
+  function updateFitRing(){
+    const fit = computeFit();
+    const c = 2*Math.PI*19;
+    const ring = document.getElementById('fitRingProgress');
+    ring.style.stroke = fit>=90?'var(--signal)':fit>=70?'var(--gold)':'var(--rust)';
+    ring.setAttribute('stroke-dasharray', c.toFixed(1));
+    ring.setAttribute('stroke-dashoffset', (c-(fit/100)*c).toFixed(1));
+    document.getElementById('fitScoreLabel').textContent = fit+'%';
+  }
+
+  /* =========================================================
+     SLIDERS
+     ========================================================= */
+  ['commute','space','school','walk','privacy'].forEach(key=>{
+    document.getElementById('slider-'+key).addEventListener('input',function(){
+      clientProfile.lifestyle[key]=parseInt(this.value,10);
+      document.getElementById('val-'+key).textContent=this.value+'%';
+      updateFitRing(); updateBrief(); updateCompleteness();
+    });
+  });
+  document.querySelectorAll('.preset-chip').forEach(chip=>{
+    chip.addEventListener('click',function(){
+      document.querySelectorAll('.preset-chip').forEach(c=>{c.classList.remove('border-[var(--gold)]','text-[var(--bone)]');c.style.background='';});
+      this.classList.add('border-[var(--gold)]','text-[var(--bone)]');
+      this.style.background='rgba(201,163,104,0.12)';
+      clientProfile.commuteTarget=this.dataset.target;
+      showToast('Commute anchor: '+this.dataset.target);
+      updateBrief(); updateCompleteness();
+    });
+  });
+
+  /* =========================================================
+     BUDGET CALCULATOR
+     ========================================================= */
+  ['purchasePrice','downPayment','rate','condoFees'].forEach(id=>
+    document.getElementById(id).addEventListener('input',recalcBudget)
+  );
+  function recalcBudget(){
+    const price  = parseFloat((document.getElementById('purchasePrice').value||'').replace(/[^0-9.]/g,''))||0;
+    const downPct= parseFloat(document.getElementById('downPayment').value)||0;
+    const rate   = parseFloat(document.getElementById('rate').value)||0;
+    const condo  = parseFloat(document.getElementById('condoFees').value)||0;
+    const loan=price*(1-downPct/100), mr=(rate/100)/12, n=300;
+    const mortgage=mr>0?loan*(mr*Math.pow(1+mr,n))/(Math.pow(1+mr,n)-1):loan/n;
+    const tax=(price*0.005)/12, ins=Math.max(80,price*0.00018), allIn=mortgage+tax+ins+condo;
+    clientProfile.budget={price,downPct,rate,condo,allIn};
+    document.getElementById('budgetTotal').textContent   = allIn?fmtMoney(allIn):'$—';
+    document.getElementById('bdMortgage').textContent    = mortgage?fmtMoney(mortgage):'$—';
+    document.getElementById('bdTax').textContent         = tax?fmtMoney(tax):'$—';
+    document.getElementById('bdInsurance').textContent   = ins?fmtMoney(ins):'$—';
+    document.getElementById('bdCondo').textContent       = fmtMoney(condo);
+    const t=allIn||1;
+    document.getElementById('bdBarMortgage').style.width =(mortgage/t*100)+'%';
+    document.getElementById('bdBarTax').style.width      =(tax/t*100)+'%';
+    document.getElementById('bdBarInsurance').style.width=(ins/t*100)+'%';
+    document.getElementById('bdBarCondo').style.width    =(condo/t*100)+'%';
+    updateFitRing(); updateBrief(); updateCompleteness();
+  }
+
+  /* =========================================================
+     AI CHAT
+     ========================================================= */
+  const chatBody    = document.getElementById('chatBody');
+  const chatOptions = document.getElementById('chatOptions');
+  const chatInput   = document.getElementById('chatInput');
+  const agentFirst  = listing.agent_first || 'your agent';
+  const propAddr    = listing.address     || 'this property';
+
+  const chatScript = [
+    { bot:`Hi! I'm putting together your brief for ${agentFirst} on ${propAddr}. First — any pets I should note for yard size or flooring?`, key:'pets', options:['Two large dogs','One cat','No pets','Other (type below)'] },
+    { bot:"Got it. Any non-negotiable must-haves for this home?", key:'mustHaves', options:['Home office space','Attached garage','Move-in ready','Open-concept kitchen'] },
+    { bot:"And dealbreakers — anything that would take this off your list immediately?", key:'dealbreakers', options:['Busy main road','No yard','Needs renovation','Steep driveway'] },
+    { bot:"Last one — what's your ideal move-in timeline?", key:'timeline', options:['Within 30 days','1–3 months','3–6 months','Just exploring'] },
+    { bot:`Perfect — that gives ${agentFirst} a complete picture. Keep adding notes below, or hit the gold button to send your profile.`, key:'done', options:[] }
+  ];
+  let chatStep = 0;
+
+  function appendMsg(role,text){
+    const div=document.createElement('div');
+    if(role==='bot'){
+      div.className='flex gap-2.5 max-w-[88%]';
+      div.innerHTML=`<div class="bg-[var(--panel-soft)] border border-[var(--hair)] rounded-2xl rounded-bl-sm px-3.5 py-2.5 font-ui text-[13px] leading-relaxed text-[var(--bone-dim)]">${text}</div>`;
+    } else {
+      div.className='flex gap-2.5 max-w-[88%] ml-auto flex-row-reverse';
+      div.innerHTML=`<div class="bg-[var(--gold)] text-black rounded-2xl rounded-br-sm px-3.5 py-2.5 font-ui text-[13px] font-medium leading-relaxed">${text}</div>`;
+    }
+    chatBody.appendChild(div);
+    chatBody.scrollTop=chatBody.scrollHeight;
+  }
+  function showTyping(){
+    const div=document.createElement('div');
+    div.className='flex gap-2.5 max-w-[88%]';
+    div.innerHTML=`<div class="bg-[var(--panel-soft)] border border-[var(--hair)] rounded-2xl rounded-bl-sm px-3.5 py-3"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+    chatBody.appendChild(div); chatBody.scrollTop=chatBody.scrollHeight; return div;
+  }
+  function renderChatOptions(){
+    const step=chatScript[chatStep]; chatOptions.innerHTML='';
+    if(!step||!step.options.length) return;
+    step.options.forEach(opt=>{
+      const btn=document.createElement('button');
+      btn.className='w-full text-left font-ui text-[11.5px] px-3 py-2 rounded-lg bg-[var(--panel-soft)] border border-[var(--hair)] text-[var(--bone-dim)] hover:border-[var(--gold)]/60 hover:text-[var(--bone)] transition-colors focus-gold';
+      btn.textContent=opt; btn.addEventListener('click',()=>handleChatAnswer(opt));
+      chatOptions.appendChild(btn);
+    });
+  }
+  function advanceChat(){
+    if(!hasListing) return;
+    const step=chatScript[chatStep]; if(!step) return;
+    const typing=showTyping();
+    setTimeout(()=>{ typing.remove(); appendMsg('bot',step.bot); renderChatOptions(); },650);
+  }
+  function handleChatAnswer(answer){
+    const step=chatScript[chatStep]; appendMsg('user',answer); chatOptions.innerHTML='';
+    if(step.key!=='done'){ clientProfile.chatAnswers[step.key]=answer; clientProfile.notes.push(answer); }
+    chatStep++; updateChatProgressLabel(); updateBrief(); updateCompleteness();
+    if(chatStep<chatScript.length) advanceChat();
+  }
+  function updateChatProgressLabel(){
+    document.getElementById('chatProgressLabel').textContent=`${Math.min(chatStep,chatScript.length-1)} of ${chatScript.length-1} notes captured`;
+  }
+  document.getElementById('chatSendBtn').addEventListener('click',sendFreeText);
+  chatInput.addEventListener('keydown',e=>{ if(e.key==='Enter') sendFreeText(); });
+  function sendFreeText(){
+    const text=chatInput.value.trim(); if(!text) return;
+    appendMsg('user',text); clientProfile.notes.push(text); chatInput.value='';
+    updateBrief(); updateCompleteness();
+    const typing=showTyping();
+    setTimeout(()=>{ typing.remove(); appendMsg('bot','Noted — added to your brief. Keep going or hit the gold button to send.'); renderChatOptions(); },600);
+  }
+
+  /* =========================================================
+     BRIEF
+     ========================================================= */
+  function buildBriefText(){
+    const w=clientProfile.lifestyle;
+    const arr=[{l:'Commute',v:w.commute},{l:'Space',v:w.space},{l:'Schools',v:w.school},{l:'Walkability',v:w.walk},{l:'Privacy/Yard',v:w.privacy}].sort((a,b)=>b.v-a.v);
+    const total=arr.reduce((s,x)=>s+x.v,0)||1;
+    const priorities=arr.slice(0,2).map(x=>`${Math.round(x.v/total*100)}% ${x.l}`).join(', ');
+    const lines=[`Property: ${listing.address||'—'}, ${listing.neighbourhood||'Calgary'} — ${computeFit()}% profile fit.`,`Priorities: ${priorities}.`];
+    if(clientProfile.commuteTarget) lines.push(`Commute anchor: ${clientProfile.commuteTarget}.`);
+    if(clientProfile.budget.allIn)  lines.push(`Budget: ${fmtMoney(clientProfile.budget.allIn)}/mo all-in (${fmtMoney(clientProfile.budget.price)} purchase, ${clientProfile.budget.downPct}% down, ${clientProfile.budget.rate}% rate).`);
+    if(clientProfile.notes.length)  lines.push(`Notes: ${clientProfile.notes.join('; ')}.`);
+    return lines.join('\n');
+  }
+  function updateBrief(){ document.getElementById('briefBox').textContent=buildBriefText(); }
+  function updateCompleteness(){
+    const w=clientProfile.lifestyle; let score=20;
+    score+=Math.min(20,[w.commute,w.space,w.school,w.walk,w.privacy].filter(v=>![70,55,30,45,60].includes(v)).length*4);
+    if(clientProfile.commuteTarget) score+=10;
+    if(clientProfile.budget.allIn)  score+=15;
+    score+=Math.min(35,clientProfile.notes.length*9);
+    document.getElementById('profileCompleteness').textContent=Math.min(100,score)+'%';
+  }
+
+  /* =========================================================
+     REQUEST INFO MODAL
+     GHL form + form_embed.js are injected dynamically here,
+     NOT on page load — this prevents form_embed.js from running
+     before our script and crashing the whole page.
+     ========================================================= */
+  const requestModal = document.getElementById('requestModal');
+  let ghlInjected = false;
+
+  function openRequestModal(){
+    const summary = buildBriefText();
+    document.getElementById('summaryPreviewText').textContent = summary;
+    document.getElementById('requestModalTitle').textContent  = 'Request Info — '+(listing.address||'this property');
+
+    // Inject GHL iframe + script once, on first modal open
+    if(!ghlInjected){
+      ghlInjected = true;
+      const container = document.getElementById('ghlFormContainer');
+      const params = new URLSearchParams();
+      params.set('property_of_interest', listing.address||'');
+      params.set('client_intent_summary', summary);
+      const src = `https://api.leadconnectorhq.com/widget/form/I0W15bpSf2WEndcCGuQ2?${params.toString()}`;
+      container.innerHTML = `<iframe
+        src="${src}"
         style="width:100%;height:834px;border:none;border-radius:8px"
         id="inline-I0W15bpSf2WEndcCGuQ2"
         data-layout="{'id':'INLINE'}"
@@ -376,476 +625,13 @@
         data-layout-iframe-id="inline-I0W15bpSf2WEndcCGuQ2"
         data-form-id="I0W15bpSf2WEndcCGuQ2"
         title="Form 1"
-      ></iframe>
-    </div>
-  </div>
-</div>
-<script src="https://link.msgsndr.com/js/form_embed.js"></script>
-
-<!-- TOAST -->
-<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[var(--panel)] border border-[var(--gold)] text-[var(--bone)] px-5 py-3.5 rounded-xl font-ui text-[13px] font-medium flex items-center gap-2.5 z-[60] opacity-0 pointer-events-none transition-all duration-300 shadow-2xl">
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C9A368" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
-  <span id="toastText">Done.</span>
-</div>
-
-<script>
-(function(){
-
-  /* =========================================================
-     READ ALL URL PARAMS FROM GHL REDIRECT
-     GHL redirect URL format:
-     ?splat_url=...
-     &listing_url=...
-     &address=...
-     &neighbourhood=...
-     &price=...
-     &beds=...
-     &baths=...
-     &sqft=...
-     &lot=...
-     &type=...
-     &description=...
-     &agent_first=...
-     &agent_last=...
-     &agent_company=...
-     ========================================================= */
-  const p = new URLSearchParams(window.location.search);
-
-  const listing = {
-    splat_url:     p.get('splat_url')      || '',
-    listing_url:   p.get('listing_url')    || '',
-    address:       p.get('address')        || '',
-    neighbourhood: p.get('neighbourhood')  || '',
-    price:         p.get('price')          || '',
-    beds:          p.get('beds')           || '',
-    baths:         p.get('baths')          || '',
-    sqft:          p.get('sqft')           || '',
-    lot:           p.get('lot')            || '',
-    type:          p.get('type')           || '',
-    description:   p.get('description')   || '',
-    agent_first:   p.get('agent_first')   || '',
-    agent_last:    p.get('agent_last')    || '',
-    agent_company: p.get('agent_company') || '',
-  };
-
-  const hasListing = listing.address || listing.splat_url;
-
-  /* =========================================================
-     3D VIEWER
-     This block must be defined BEFORE initPortal() is called below —
-     initPortal() calls loadViewer() synchronously, and loadViewer()
-     reads these const-declared DOM references. const/let are not
-     hoisted the way function declarations are, so if this block sat
-     after the call site, every page load with a listing would throw
-     "Cannot access 'viewerLoading' before initialization" the
-     instant loadViewer() ran, silently aborting the rest of
-     initPortal() (budget calc, fit score, chat — everything after
-     the viewer call in source order would never execute).
-     ========================================================= */
-  const splatEmbed     = document.getElementById('splatEmbed');
-  const viewerLoading  = document.getElementById('viewerLoading');
-  const viewerError    = document.getElementById('viewerError');
-  const viewerErrorDetail = document.getElementById('viewerErrorDetail');
-  const viewerSourceLabel = document.getElementById('viewerSourceLabel');
-
-  function resolveEmbedUrl(raw){
-    if(!raw || !raw.trim()) return { ok:false, reason:'No 3D tour link was provided for this listing.' };
-    const url = raw.trim();
-    if(url.indexOf('REPLACE') !== -1) return { ok:false, reason:'This listing is using a placeholder link — the agent needs to paste the real SuperSplat or Polycam URL.' };
-
-    let parsed;
-    try{ parsed = new URL(url); } catch(e){ return { ok:false, reason:'That doesn\'t look like a valid URL.' }; }
-    const host = parsed.hostname.replace(/^www\./,'');
-
-    if(host === 'superspl.at'){
-      // The Studio editor link (.../scene/<id>/studio) is owner-only and
-      // 404s for anyone else — this is the single most common mistake
-      // when copying a SuperSplat link, since it's what shows in the
-      // address bar while editing. Catch it specifically so the error
-      // tells the agent exactly what to fix instead of just failing.
-      const studioMatch = parsed.pathname.match(/^\/scene\/([a-zA-Z0-9_-]+)\/studio\/?$/);
-      if(studioMatch){
-        return { ok:false, reason:'That\'s the Studio editing link, which only works for the splat\'s owner. Use the "Embed" button on the scene page instead and paste that link.' };
-      }
-      // The real embed link, confirmed directly from SuperSplat's own
-      // "Embed" button output: https://superspl.at/s?id=<hash> — this
-      // is the clean player with no SuperSplat site chrome, and is
-      // what agents should be pasting. Accept it as-is.
-      if(parsed.pathname === '/s' && parsed.searchParams.get('id')){
-        return { ok:true, url:`https://superspl.at/s?id=${parsed.searchParams.get('id')}`, source:'SuperSplat' };
-      }
-      // Fallback: the public scene page link (superspl.at/scene/<id>),
-      // in case an agent pastes that instead of using the Embed button.
-      // Same hash, so we can still normalize it to the clean embed URL.
-      const sceneMatch = parsed.pathname.match(/^\/scene\/([a-zA-Z0-9_-]+)\/?$/);
-      if(sceneMatch){
-        return { ok:true, url:`https://superspl.at/s?id=${sceneMatch[1]}`, source:'SuperSplat' };
-      }
-      return { ok:false, reason:'That SuperSplat link isn\'t in a recognized format. Use the "Embed" button on the scene page and paste that link.' };
+      ></iframe>`;
+      // Load form_embed.js after iframe is in DOM
+      const s = document.createElement('script');
+      s.src = 'https://link.msgsndr.com/js/form_embed.js';
+      document.body.appendChild(s);
     }
 
-    if(host === 'poly.cam' || host === 'polycam.com'){
-      const m = parsed.pathname.match(/^\/capture\/([a-zA-Z0-9-]+)/);
-      if(!m) return { ok:false, reason:'That Polycam link isn\'t in a recognized format. Use poly.cam/capture/...' };
-      return { ok:true, url:`https://poly.cam/capture/${m[1]}/embed`, source:'Live 3D Splat · Polycam' };
-    }
-
-    return { ok:false, reason:`"${host}" isn't a supported viewer. Use a SuperSplat scene URL or Polycam capture link.` };
-  }
-
-  function loadViewer(rawUrl){
-    const result = resolveEmbedUrl(rawUrl);
-    if(!result.ok){
-      viewerError.style.display = 'flex';
-      viewerLoading.style.display = 'none';
-      viewerErrorDetail.textContent = result.reason;
-      splatEmbed.style.visibility = 'hidden';
-      return;
-    }
-    viewerError.style.display = 'none';
-    viewerLoading.style.display = 'flex';
-    viewerLoading.style.opacity = '1';
-    splatEmbed.style.visibility = 'visible';
-    viewerSourceLabel.textContent = result.source;
-    splatEmbed.src = result.url;
-    // Hide loading overlay — cross-origin iframes don't always fire
-    // load reliably, so we use a short fallback timer as the safety net.
-    const hideLoading = () => {
-      viewerLoading.style.opacity = '0';
-      setTimeout(() => { viewerLoading.style.display = 'none'; }, 500);
-    };
-    const timer = setTimeout(hideLoading, 3000);
-    splatEmbed.addEventListener('load', function onLoad(){
-      clearTimeout(timer);
-      hideLoading();
-      splatEmbed.removeEventListener('load', onLoad);
-    });
-  }
-
-  // NOTE: the show/hide state check + initPortal() call has been moved
-  // to the very end of this script (just before the closing IIFE), so
-  // that every const/function this code depends on — clientProfile,
-  // homeAttrs, chatBody, chatScript, requestModal, etc. — has already
-  // been declared by the time initPortal() actually runs. See the
-  // bottom of this script for the real call site.
-
-  function initPortal(){
-
-    /* --- Agent branding --- */
-    const agentName = [listing.agent_first, listing.agent_last].filter(Boolean).join(' ') || 'Your Agent';
-    const agentCompany = listing.agent_company || '';
-    const initials = [listing.agent_first?.[0], listing.agent_last?.[0]].filter(Boolean).join('').toUpperCase() || '?';
-
-    document.getElementById('agentInitials').textContent = initials;
-    document.getElementById('agentNameLabel').textContent = agentCompany
-      ? `${agentName}, ${agentCompany}`
-      : agentName;
-    document.getElementById('briefLabel').textContent = `Synthesized for ${listing.agent_first || 'your agent'}`;
-
-    /* --- Property header --- */
-    const neighbourhood = listing.neighbourhood || '';
-    const city = 'Calgary, AB';
-    document.getElementById('propertyEyebrow').textContent =
-      [neighbourhood, city, '3D Gaussian Splat Walkthrough'].filter(Boolean).join(' · ');
-    document.getElementById('propertyH1').textContent = listing.address || 'Property';
-
-    // Format price — strip non-numeric, add $ and commas
-    const priceNum = parseFloat(listing.price.replace(/[^0-9.]/g,'')) || 0;
-    document.getElementById('propertyPriceLabel').textContent = priceNum
-      ? '$' + priceNum.toLocaleString('en-US')
-      : listing.price || '—';
-
-    const specs = [
-      listing.beds  ? listing.beds + ' bd'  : null,
-      listing.baths ? listing.baths + ' ba' : null,
-      listing.sqft  ? listing.sqft.toLocaleString() + ' sqft' : null,
-      listing.type  || null
-    ].filter(Boolean).join(' · ');
-    document.getElementById('propertySpecsLabel').textContent = specs || '—';
-
-    document.title = (listing.address || 'Property') + ' — Gaussian Property Portal';
-    document.getElementById('requestModalTitle').textContent =
-      'Request Info — ' + (listing.address || 'this property');
-
-    /* --- Facts strip --- */
-    document.getElementById('factBeds').textContent =
-      listing.beds && listing.baths ? `${listing.beds} / ${listing.baths}` : '—';
-    document.getElementById('factSqft').textContent = listing.sqft
-      ? Number(listing.sqft.replace(/[^0-9]/,'')).toLocaleString() || listing.sqft
-      : '—';
-    document.getElementById('factType').textContent = listing.type || '—';
-    document.getElementById('factLot').textContent  = listing.lot  || '—';
-
-    /* --- Description --- */
-    document.getElementById('propertyDescription').textContent = listing.description || '';
-
-    /* --- MLS listing link --- */
-    const linkEl  = document.getElementById('viewListingLink');
-    const labelEl = document.getElementById('viewListingLabel');
-    if(listing.listing_url && listing.listing_url.indexOf('REPLACE') === -1){
-      linkEl.href = listing.listing_url;
-      try{
-        const host = new URL(listing.listing_url).hostname.replace(/^www\./,'');
-        const names = { 'realtor.ca':'Realtor.ca','zillow.com':'Zillow','redfin.com':'Redfin','centris.ca':'Centris','point2homes.com':'Point2Homes' };
-        labelEl.textContent = 'View Full Listing on ' + (names[host] || host);
-      } catch(e){ labelEl.textContent = 'View Full Listing'; }
-    } else {
-      linkEl.href = '#';
-      linkEl.style.opacity = '0.4';
-      linkEl.style.pointerEvents = 'none';
-      labelEl.textContent = 'Full listing not provided';
-    }
-
-    /* --- Budget pre-fill from listing price — must happen before recalcBudget() --- */
-    if(priceNum){
-      document.getElementById('purchasePrice').value = priceNum;
-    }
-
-    /* --- 3D Viewer --- */
-    loadViewer(listing.splat_url);
-
-    /* --- Init all panels now that DOM values are set --- */
-    recalcBudget();
-    updateFitRing();
-    updateBrief();
-    updateCompleteness();
-    updateChatProgressLabel();
-    advanceChat();
-  }
-
-  /* =========================================================
-     CLIENT PROFILE STATE
-     ========================================================= */
-  const clientProfile = {
-    lifestyle:{ commute:70, space:55, school:30, walk:45, privacy:60 },
-    commuteTarget: null,
-    budget:{ price:0, downPct:20, rate:4.9, condo:0, allIn:0 },
-    notes:[], chatAnswers:{}
-  };
-
-  function fmtMoney(n){ return '$' + Math.round(n).toLocaleString('en-US'); }
-
-  /* =========================================================
-     FIT SCORE
-     ========================================================= */
-  // Home attribute scores 0-100 — these represent how well this
-  // property type (detached Calgary suburban) scores on each dimension.
-  // In a multi-listing version these would come from per-listing data.
-  const homeAttrs = { commute:55, space:90, school:80, walk:35, privacy:88 };
-
-  function computeFit(){
-    const w = clientProfile.lifestyle;
-    const total = w.commute+w.space+w.school+w.walk+w.privacy || 1;
-    return Math.round((homeAttrs.commute*w.commute + homeAttrs.space*w.space + homeAttrs.school*w.school + homeAttrs.walk*w.walk + homeAttrs.privacy*w.privacy) / total);
-  }
-
-  function updateFitRing(){
-    const fit = computeFit();
-    const c = 2*Math.PI*19;
-    const offset = c - (fit/100)*c;
-    const color = fit>=90?'var(--signal)':fit>=70?'var(--gold)':'var(--rust)';
-    const ring = document.getElementById('fitRingProgress');
-    ring.style.stroke = color;
-    ring.setAttribute('stroke-dasharray', c.toFixed(1));
-    ring.setAttribute('stroke-dashoffset', offset.toFixed(1));
-    document.getElementById('fitScoreLabel').textContent = fit+'%';
-    const note = document.getElementById('budgetFitNote');
-    const over = clientProfile.budget.price && listing.price &&
-      clientProfile.budget.price > parseFloat(listing.price.replace(/[^0-9.]/g,''))*1.05;
-    note.textContent = over ? 'Note: estimated carrying cost may exceed budget target.' : '';
-    note.className = 'font-ui text-[11px] mt-3 text-[var(--rust)]';
-  }
-
-  /* =========================================================
-     SLIDERS
-     ========================================================= */
-  ['commute','space','school','walk','privacy'].forEach(key => {
-    const el = document.getElementById('slider-'+key);
-    const vl = document.getElementById('val-'+key);
-    el.addEventListener('input', function(){
-      clientProfile.lifestyle[key] = parseInt(this.value,10);
-      vl.textContent = this.value+'%';
-      updateFitRing(); updateBrief(); updateCompleteness();
-    });
-  });
-
-  document.querySelectorAll('.preset-chip').forEach(chip => {
-    chip.addEventListener('click', function(){
-      document.querySelectorAll('.preset-chip').forEach(c=>{ c.classList.remove('border-[var(--gold)]','text-[var(--bone)]'); c.style.background=''; });
-      this.classList.add('border-[var(--gold)]','text-[var(--bone)]');
-      this.style.background='rgba(201,163,104,0.12)';
-      clientProfile.commuteTarget = this.dataset.target;
-      showToast('Commute anchor: '+this.dataset.target);
-      updateBrief(); updateCompleteness();
-    });
-  });
-
-  /* =========================================================
-     BUDGET CALCULATOR
-     ========================================================= */
-  ['purchasePrice','downPayment','rate','condoFees'].forEach(id =>
-    document.getElementById(id).addEventListener('input', recalcBudget)
-  );
-
-  function recalcBudget(){
-    const price = parseFloat(document.getElementById('purchasePrice').value.replace(/[^0-9.]/g,''))||0;
-    const downPct = parseFloat(document.getElementById('downPayment').value)||0;
-    const rate = parseFloat(document.getElementById('rate').value)||0;
-    const condo = parseFloat(document.getElementById('condoFees').value)||0;
-    const loan = price*(1-downPct/100);
-    const mr = (rate/100)/12;
-    const n = 300;
-    const mortgage = mr>0 ? loan*(mr*Math.pow(1+mr,n))/(Math.pow(1+mr,n)-1) : loan/n;
-    const tax = (price*0.005)/12;
-    const ins = Math.max(80, price*0.00018);
-    const allIn = mortgage+tax+ins+condo;
-    clientProfile.budget = { price, downPct, rate, condo, allIn };
-    document.getElementById('budgetTotal').textContent   = allIn   ? fmtMoney(allIn)    : '$—';
-    document.getElementById('bdMortgage').textContent    = mortgage ? fmtMoney(mortgage) : '$—';
-    document.getElementById('bdTax').textContent         = tax      ? fmtMoney(tax)      : '$—';
-    document.getElementById('bdInsurance').textContent   = ins      ? fmtMoney(ins)      : '$—';
-    document.getElementById('bdCondo').textContent       = fmtMoney(condo);
-    const t = allIn||1;
-    document.getElementById('bdBarMortgage').style.width  = (mortgage/t*100)+'%';
-    document.getElementById('bdBarTax').style.width       = (tax/t*100)+'%';
-    document.getElementById('bdBarInsurance').style.width = (ins/t*100)+'%';
-    document.getElementById('bdBarCondo').style.width     = (condo/t*100)+'%';
-    updateFitRing(); updateBrief(); updateCompleteness();
-  }
-
-  /* =========================================================
-     AI CHAT
-     ========================================================= */
-  const chatBody    = document.getElementById('chatBody');
-  const chatOptions = document.getElementById('chatOptions');
-  const chatInput   = document.getElementById('chatInput');
-
-  const chatScript = [
-    { bot:`Hi! I'm putting together your brief for ${listing.agent_first||'your agent'} on ${listing.address||'this property'}. First — any pets I should note for yard size or flooring considerations?`, key:'pets', options:['Two large dogs','One cat','No pets','Other (type below)'] },
-    { bot:"Got it. Any non-negotiable must-haves for this home?", key:'mustHaves', options:['Home office space','Attached garage','Move-in ready','Open-concept kitchen'] },
-    { bot:"And dealbreakers — anything that would take this property off your list immediately?", key:'dealbreakers', options:['Busy main road','No yard','Needs renovation','Steep driveway'] },
-    { bot:"Last one — what's your ideal move-in timeline?", key:'timeline', options:['Within 30 days','1–3 months','3–6 months','Just exploring'] },
-    { bot:`Perfect — that gives ${listing.agent_first||'your agent'} a complete picture. You can keep adding notes below, or hit the gold button to send your full profile.`, key:'done', options:[] }
-  ];
-  let chatStep = 0;
-
-  function appendMsg(role, text){
-    const div = document.createElement('div');
-    if(role==='bot'){
-      div.className='flex gap-2.5 max-w-[88%]';
-      div.innerHTML=`<div class="bg-[var(--panel-soft)] border border-[var(--hair)] rounded-2xl rounded-bl-sm px-3.5 py-2.5 font-ui text-[13px] leading-relaxed text-[var(--bone-dim)]">${text}</div>`;
-    } else {
-      div.className='flex gap-2.5 max-w-[88%] ml-auto flex-row-reverse';
-      div.innerHTML=`<div class="bg-[var(--gold)] text-black rounded-2xl rounded-br-sm px-3.5 py-2.5 font-ui text-[13px] font-medium leading-relaxed">${text}</div>`;
-    }
-    chatBody.appendChild(div);
-    chatBody.scrollTop = chatBody.scrollHeight;
-  }
-
-  function showTyping(){
-    const div = document.createElement('div');
-    div.className='flex gap-2.5 max-w-[88%]';
-    div.innerHTML=`<div class="bg-[var(--panel-soft)] border border-[var(--hair)] rounded-2xl rounded-bl-sm px-3.5 py-3"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
-    chatBody.appendChild(div);
-    chatBody.scrollTop = chatBody.scrollHeight;
-    return div;
-  }
-
-  function renderChatOptions(){
-    const step = chatScript[chatStep];
-    chatOptions.innerHTML='';
-    if(!step||!step.options.length) return;
-    step.options.forEach(opt=>{
-      const btn = document.createElement('button');
-      btn.className='w-full text-left font-ui text-[11.5px] px-3 py-2 rounded-lg bg-[var(--panel-soft)] border border-[var(--hair)] text-[var(--bone-dim)] hover:border-[var(--gold)]/60 hover:text-[var(--bone)] transition-colors focus-gold';
-      btn.textContent=opt;
-      btn.addEventListener('click',()=>handleChatAnswer(opt));
-      chatOptions.appendChild(btn);
-    });
-  }
-
-  function advanceChat(){
-    if(!hasListing) return;
-    const step = chatScript[chatStep];
-    if(!step) return;
-    const typing = showTyping();
-    setTimeout(()=>{ typing.remove(); appendMsg('bot',step.bot); renderChatOptions(); },650);
-  }
-
-  function handleChatAnswer(answer){
-    const step = chatScript[chatStep];
-    appendMsg('user',answer);
-    chatOptions.innerHTML='';
-    if(step.key!=='done'){ clientProfile.chatAnswers[step.key]=answer; clientProfile.notes.push(answer); }
-    chatStep++;
-    updateChatProgressLabel(); updateBrief(); updateCompleteness();
-    if(chatStep<chatScript.length) advanceChat();
-  }
-
-  function updateChatProgressLabel(){
-    const captured = Math.min(chatStep, chatScript.length-1);
-    document.getElementById('chatProgressLabel').textContent = `${captured} of ${chatScript.length-1} notes captured`;
-  }
-
-  document.getElementById('chatSendBtn').addEventListener('click', sendFreeText);
-  chatInput.addEventListener('keydown', e=>{ if(e.key==='Enter') sendFreeText(); });
-
-  function sendFreeText(){
-    const text = chatInput.value.trim();
-    if(!text) return;
-    appendMsg('user',text);
-    clientProfile.notes.push(text);
-    chatInput.value='';
-    updateBrief(); updateCompleteness();
-    const typing = showTyping();
-    setTimeout(()=>{ typing.remove(); appendMsg('bot','Noted — added to your brief. Keep going or use the gold button to send.'); renderChatOptions(); },600);
-  }
-
-  /* =========================================================
-     BRIEF
-     ========================================================= */
-  function buildBriefText(){
-    const w = clientProfile.lifestyle;
-    const arr = [{l:'Commute',v:w.commute},{l:'Space',v:w.space},{l:'Schools',v:w.school},{l:'Walkability',v:w.walk},{l:'Privacy/Yard',v:w.privacy}];
-    arr.sort((a,b)=>b.v-a.v);
-    const total = arr.reduce((s,x)=>s+x.v,0)||1;
-    const priorities = arr.slice(0,2).map(x=>`${Math.round(x.v/total*100)}% ${x.l}`).join(', ');
-    const lines = [];
-    lines.push(`Property: ${listing.address||'—'}, ${listing.neighbourhood||'Calgary'}, AB — ${computeFit()}% profile fit.`);
-    lines.push(`Priorities: ${priorities}.`);
-    if(clientProfile.commuteTarget) lines.push(`Commute anchor: ${clientProfile.commuteTarget}.`);
-    if(clientProfile.budget.allIn) lines.push(`Budget: ${fmtMoney(clientProfile.budget.allIn)}/mo all-in (${fmtMoney(clientProfile.budget.price)} purchase, ${clientProfile.budget.downPct}% down, ${clientProfile.budget.rate}% rate).`);
-    if(clientProfile.notes.length) lines.push(`Notes: ${clientProfile.notes.join('; ')}.`);
-    return lines.join('\n');
-  }
-
-  function updateBrief(){
-    document.getElementById('briefBox').textContent = buildBriefText();
-  }
-
-  function updateCompleteness(){
-    let score = 20;
-    const w = clientProfile.lifestyle;
-    score += Math.min(20,[w.commute,w.space,w.school,w.walk,w.privacy].filter(v=>![70,55,30,45,60].includes(v)).length*4);
-    if(clientProfile.commuteTarget) score+=10;
-    if(clientProfile.budget.allIn)  score+=15;
-    score += Math.min(35, clientProfile.notes.length*9);
-    document.getElementById('profileCompleteness').textContent = Math.min(100,score)+'%';
-  }
-
-  /* =========================================================
-     REQUEST INFO MODAL
-     ========================================================= */
-  const requestModal = document.getElementById('requestModal');
-
-  function openRequestModal(){
-    const summary = buildBriefText();
-    document.getElementById('summaryPreviewText').textContent = summary;
-    const iframe = document.getElementById('inline-I0W15bpSf2WEndcCGuQ2');
-    const params = new URLSearchParams();
-    params.set('property_of_interest', listing.address||'');
-    params.set('client_intent_summary', summary);
-    iframe.src = `https://api.leadconnectorhq.com/widget/form/I0W15bpSf2WEndcCGuQ2?${params.toString()}`;
     requestModal.classList.remove('hidden');
     requestModal.classList.add('flex');
   }
@@ -859,20 +645,71 @@
      ========================================================= */
   let toastTimer;
   function showToast(msg){
-    const toast = document.getElementById('toast');
-    document.getElementById('toastText').textContent = msg;
-    toast.classList.remove('opacity-0','pointer-events-none');
-    toast.classList.add('opacity-100');
+    const toast=document.getElementById('toast');
+    document.getElementById('toastText').textContent=msg;
+    toast.classList.remove('opacity-0','pointer-events-none'); toast.classList.add('opacity-100');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(()=>{ toast.classList.add('opacity-0','pointer-events-none'); toast.classList.remove('opacity-100'); },3200);
+    toastTimer=setTimeout(()=>{ toast.classList.add('opacity-0','pointer-events-none'); toast.classList.remove('opacity-100'); },3200);
   }
 
   /* =========================================================
-     SHOW/HIDE STATES — runs last, after every const/function above
-     (clientProfile, homeAttrs, chatBody, chatScript, requestModal,
-     splatEmbed, etc.) has been declared, so initPortal() can safely
-     call into all of them without hitting a "Cannot access before
-     initialization" error.
+     INIT PORTAL — populates all DOM from listing object
+     ========================================================= */
+  function initPortal(){
+    const agentName    = [listing.agent_first,listing.agent_last].filter(Boolean).join(' ')||'Your Agent';
+    const agentCompany = listing.agent_company||'';
+    const initials     = [listing.agent_first?.[0],listing.agent_last?.[0]].filter(Boolean).join('').toUpperCase()||'?';
+    document.getElementById('agentInitials').textContent   = initials;
+    document.getElementById('agentNameLabel').textContent  = agentCompany?`${agentName}, ${agentCompany}`:agentName;
+    document.getElementById('briefLabel').textContent      = `Synthesized for ${listing.agent_first||'your agent'}`;
+
+    const neighbourhood = listing.neighbourhood||'';
+    document.getElementById('propertyEyebrow').textContent = [neighbourhood,'Calgary, AB','3D Gaussian Splat Walkthrough'].filter(Boolean).join(' · ');
+    document.getElementById('propertyH1').textContent      = listing.address||'Property';
+
+    const priceNum = parseFloat((listing.price||'').replace(/[^0-9.]/g,''))||0;
+    document.getElementById('propertyPriceLabel').textContent = priceNum?'$'+priceNum.toLocaleString('en-US'):(listing.price||'—');
+    document.getElementById('propertySpecsLabel').textContent = [
+      listing.beds  ? listing.beds+' bd'   : null,
+      listing.baths ? listing.baths+' ba'  : null,
+      listing.sqft  ? listing.sqft+' sqft' : null,
+      listing.type  || null
+    ].filter(Boolean).join(' · ')||'—';
+
+    document.title = (listing.address||'Property')+' — Gaussian Property Portal';
+
+    document.getElementById('factBeds').textContent  = listing.beds&&listing.baths?`${listing.beds} / ${listing.baths}`:'—';
+    document.getElementById('factSqft').textContent  = listing.sqft?Number(listing.sqft.replace(/[^0-9]/g,'')).toLocaleString()||listing.sqft:'—';
+    document.getElementById('factType').textContent  = listing.type||'—';
+    document.getElementById('factLot').textContent   = listing.lot||'—';
+    document.getElementById('propertyDescription').textContent = listing.description||'';
+
+    const linkEl=document.getElementById('viewListingLink'), labelEl=document.getElementById('viewListingLabel');
+    if(listing.listing_url && listing.listing_url.indexOf('REPLACE')===-1){
+      linkEl.href=listing.listing_url;
+      try{
+        const host=new URL(listing.listing_url).hostname.replace(/^www\./,'');
+        const names={'realtor.ca':'Realtor.ca','zillow.com':'Zillow','redfin.com':'Redfin','centris.ca':'Centris','point2homes.com':'Point2Homes'};
+        labelEl.textContent='View Full Listing on '+(names[host]||host);
+      }catch(e){ labelEl.textContent='View Full Listing'; }
+    } else {
+      linkEl.href='#'; linkEl.style.opacity='0.4'; linkEl.style.pointerEvents='none';
+      labelEl.textContent='Full listing not provided';
+    }
+
+    if(priceNum) document.getElementById('purchasePrice').value = priceNum;
+
+    loadViewer(listing.splat_url);
+    recalcBudget();
+    updateFitRing();
+    updateBrief();
+    updateCompleteness();
+    updateChatProgressLabel();
+    advanceChat();
+  }
+
+  /* =========================================================
+     BOOT
      ========================================================= */
   if(!hasListing){
     document.getElementById('noListingState').classList.remove('hidden');
