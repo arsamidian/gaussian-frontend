@@ -319,11 +319,6 @@
 <script>
 (function(){
 
-  /* =========================================================
-     URL PARAMS
-     Primary listing: same as before (splat_url, address, etc.)
-     Additional listings: l1_*, l2_*, ... l9_*
-     ========================================================= */
   const p = new URLSearchParams(window.location.search);
 
   function getListingFromParams(prefix){
@@ -343,9 +338,8 @@
     };
   }
 
-  let listing = getListingFromParams(''); // primary listing (no prefix)
+  let listing = getListingFromParams('');
 
-  // Additional listings l1_* … l9_*
   const additionalListings = [];
   for(let i=1;i<=9;i++){
     const addr = p.get(`l${i}_address`);
@@ -370,15 +364,12 @@
   const agentCompany = p.get('agent_company') || '';
   const hasListing   = !!(listing.address || listing.splat_url);
 
-  // Show "back to all listings" if we came from the gallery (additional listings present)
   if(additionalListings.length > 0){
     const backBtn = document.getElementById('backToGallery');
-    // Reconstruct gallery URL with all listings
     const gp = new URLSearchParams();
     gp.set('agent_first', agentFirst);
     gp.set('agent_last', agentLast);
     gp.set('agent_company', agentCompany);
-    // Primary becomes l1, additionals become l2..lN
     const allForGallery = [listing, ...additionalListings];
     allForGallery.forEach((l, i) => {
       const n = i+1;
@@ -399,9 +390,6 @@
     backBtn.classList.add('flex');
   }
 
-  /* =========================================================
-     3D VIEWER
-     ========================================================= */
   const splatEmbed        = document.getElementById('splatEmbed');
   const viewerLoading     = document.getElementById('viewerLoading');
   const viewerError       = document.getElementById('viewerError');
@@ -458,9 +446,6 @@
     splatEmbed.addEventListener('load',function onLoad(){ clearTimeout(t); hideLoading(); splatEmbed.removeEventListener('load',onLoad); });
   }
 
-  /* =========================================================
-     CLIENT PROFILE STATE
-     ========================================================= */
   const clientProfile = {
     lifestyle:{ commute:70, space:55, school:30, walk:45, privacy:60 },
     commuteTarget:null,
@@ -469,9 +454,6 @@
   };
   function fmtMoney(n){ return '$'+Math.round(n).toLocaleString('en-US'); }
 
-  /* =========================================================
-     FIT SCORE
-     ========================================================= */
   const homeAttrs = { commute:55, space:85, school:75, walk:40, privacy:80 };
   function computeFit(){
     const w=clientProfile.lifestyle;
@@ -488,9 +470,6 @@
     document.getElementById('fitScoreLabel').textContent=fit+'%';
   }
 
-  /* =========================================================
-     SLIDERS
-     ========================================================= */
   ['commute','space','school','walk','privacy'].forEach(key=>{
     document.getElementById('slider-'+key).addEventListener('input',function(){
       clientProfile.lifestyle[key]=parseInt(this.value,10);
@@ -509,9 +488,6 @@
     });
   });
 
-  /* =========================================================
-     BUDGET CALCULATOR
-     ========================================================= */
   ['purchasePrice','downPayment','rate','condoFees'].forEach(id=>
     document.getElementById(id).addEventListener('input',recalcBudget)
   );
@@ -537,9 +513,6 @@
     updateFitRing(); updateBrief(); updateCompleteness();
   }
 
-  /* =========================================================
-     AI CHAT
-     ========================================================= */
   const chatBody    = document.getElementById('chatBody');
   const chatOptions = document.getElementById('chatOptions');
   const chatInput   = document.getElementById('chatInput');
@@ -609,9 +582,6 @@
     setTimeout(()=>{ typing.remove(); appendMsg('bot','Noted — added to your brief. Keep going or hit the gold button to send.'); renderChatOptions(); },600);
   }
 
-  /* =========================================================
-     BRIEF
-     ========================================================= */
   function buildBriefText(){
     const w=clientProfile.lifestyle;
     const arr=[{l:'Commute',v:w.commute},{l:'Space',v:w.space},{l:'Schools',v:w.school},{l:'Walkability',v:w.walk},{l:'Privacy/Yard',v:w.privacy}].sort((a,b)=>b.v-a.v);
@@ -636,11 +606,6 @@
     document.getElementById('profileCompleteness').textContent=Math.min(100,score)+'%';
   }
 
-  /* =========================================================
-     ADDITIONAL LISTINGS SWITCHER
-     Renders the cards below the description and swaps portal
-     in-place when clicked (no page reload).
-     ========================================================= */
   function renderAdditionalListings(alts){
     if(!alts.length) return;
     const section  = document.getElementById('additionalSection');
@@ -699,18 +664,11 @@
     section.classList.remove('hidden');
   }
 
-  /* ── In-place listing switch ── */
   function switchListing(newPrimary, currentAlts){
-    // The new "others" = the old primary + the remaining alts (excluding the new primary)
     const oldPrimary = Object.assign({}, listing);
     const newAlts = [oldPrimary, ...currentAlts.filter(a => a.address !== newPrimary.address)];
-
     listing = newPrimary;
-
-    // Scroll to top of main
     document.getElementById('mainLayout').scrollIntoView({ behavior:'smooth', block:'start' });
-
-    // Update header strip
     document.getElementById('propertyEyebrow').textContent = [newPrimary.neighbourhood||'','Calgary, AB','3D Gaussian Splat Walkthrough'].filter(Boolean).join(' · ');
     document.getElementById('propertyH1').textContent = newPrimary.address || 'Property';
     const priceNum = parseFloat((newPrimary.price||'').replace(/[^0-9.]/g,''))||0;
@@ -722,15 +680,11 @@
       newPrimary.type  || null,
     ].filter(Boolean).join(' · ') || '—';
     document.title = (newPrimary.address||'Property')+' — Gaussian Property Portal';
-
-    // Fact tiles
     document.getElementById('factBeds').textContent  = newPrimary.beds&&newPrimary.baths?`${newPrimary.beds} / ${newPrimary.baths}`:'—';
     document.getElementById('factSqft').textContent  = newPrimary.sqft?Number(newPrimary.sqft.replace(/[^0-9]/g,'')).toLocaleString()||newPrimary.sqft:'—';
     document.getElementById('factType').textContent  = newPrimary.type||'—';
     document.getElementById('factLot').textContent   = newPrimary.lot||'—';
     document.getElementById('propertyDescription').textContent = newPrimary.description||'';
-
-    // Listing link
     const linkEl = document.getElementById('viewListingLink');
     const labelEl = document.getElementById('viewListingLabel');
     if(newPrimary.listing_url && newPrimary.listing_url.indexOf('REPLACE')===-1){
@@ -745,23 +699,17 @@
       linkEl.href='#'; linkEl.style.opacity='0.4'; linkEl.style.pointerEvents='none';
       labelEl.textContent='Full listing not provided';
     }
-
-    // Budget price field
     if(priceNum) document.getElementById('purchasePrice').value = priceNum;
     recalcBudget();
-
-    // Reload viewer
     loadViewer(newPrimary.splat_url);
-
-    // Update brief (address changed)
     updateBrief();
     updateFitRing();
-
-    // Re-render additional listings with the new set
     document.getElementById('additionalListings').innerHTML='';
     document.getElementById('additionalSection').classList.add('hidden');
     renderAdditionalListings(newAlts);
-
+    // Reset modal so it rebuilds with new listing data
+    ghlInjected = false;
+    document.getElementById('ghlFormContainer').innerHTML = '';
     showToast('Switched to '+newPrimary.address);
   }
 
@@ -781,6 +729,10 @@
       const params = new URLSearchParams();
       params.set('property_of_interest', listing.address||'');
       params.set('client_intent_summary', summary);
+      // Pass agent info so GHL can store it on the consumer contact
+      params.set('agent_first', agentFirst||'');
+      params.set('agent_last', agentLast||'');
+      params.set('agent_company', agentCompany||'');
       const src = `https://api.leadconnectorhq.com/widget/form/I0W15bpSf2WEndcCGuQ2?${params.toString()}`;
       container.innerHTML = `<iframe src="${src}" style="width:100%;height:834px;border:none;border-radius:8px" id="inline-I0W15bpSf2WEndcCGuQ2" data-layout="{'id':'INLINE'}" data-trigger-type="alwaysShow" data-trigger-value="" data-activation-type="alwaysActivated" data-activation-value="" data-deactivation-type="neverDeactivate" data-deactivation-value="" data-form-name="Form 1" data-height="834" data-layout-iframe-id="inline-I0W15bpSf2WEndcCGuQ2" data-form-id="I0W15bpSf2WEndcCGuQ2" title="Form 1"></iframe>`;
       const s = document.createElement('script'); s.src='https://link.msgsndr.com/js/form_embed.js'; document.body.appendChild(s);
@@ -793,9 +745,6 @@
   document.getElementById('closeRequestModal').addEventListener('click',()=>{ requestModal.classList.add('hidden'); requestModal.classList.remove('flex'); });
   requestModal.addEventListener('click',e=>{ if(e.target===requestModal){ requestModal.classList.add('hidden'); requestModal.classList.remove('flex'); }});
 
-  /* =========================================================
-     TOAST
-     ========================================================= */
   let toastTimer;
   function showToast(msg){
     const toast=document.getElementById('toast');
@@ -805,21 +754,14 @@
     toastTimer=setTimeout(()=>{ toast.classList.add('opacity-0','pointer-events-none'); toast.classList.remove('opacity-100'); },3200);
   }
 
-  /* =========================================================
-     HELPERS
-     ========================================================= */
   function escHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-  /* =========================================================
-     INIT PORTAL
-     ========================================================= */
   function initPortal(){
     const agentName    = [agentFirst,agentLast].filter(Boolean).join(' ')||'Your Agent';
     const initials     = [agentFirst?.[0],agentLast?.[0]].filter(Boolean).join('').toUpperCase()||'?';
     document.getElementById('agentInitials').textContent  = initials;
     document.getElementById('agentNameLabel').textContent = agentCompany?`${agentName}, ${agentCompany}`:agentName;
     document.getElementById('briefLabel').textContent     = `Synthesized for ${agentFirst||'your agent'}`;
-
     document.getElementById('propertyEyebrow').textContent = [listing.neighbourhood||'','Calgary, AB','3D Gaussian Splat Walkthrough'].filter(Boolean).join(' · ');
     document.getElementById('propertyH1').textContent      = listing.address||'Property';
     const priceNum = parseFloat((listing.price||'').replace(/[^0-9.]/g,''))||0;
@@ -831,13 +773,11 @@
       listing.type  || null
     ].filter(Boolean).join(' · ')||'—';
     document.title = (listing.address||'Property')+' — Gaussian Property Portal';
-
     document.getElementById('factBeds').textContent  = listing.beds&&listing.baths?`${listing.beds} / ${listing.baths}`:'—';
     document.getElementById('factSqft').textContent  = listing.sqft?Number(listing.sqft.replace(/[^0-9]/g,'')).toLocaleString()||listing.sqft:'—';
     document.getElementById('factType').textContent  = listing.type||'—';
     document.getElementById('factLot').textContent   = listing.lot||'—';
     document.getElementById('propertyDescription').textContent = listing.description||'';
-
     const linkEl=document.getElementById('viewListingLink'), labelEl=document.getElementById('viewListingLabel');
     if(listing.listing_url && listing.listing_url.indexOf('REPLACE')===-1){
       linkEl.href=listing.listing_url;
@@ -850,9 +790,7 @@
       linkEl.href='#'; linkEl.style.opacity='0.4'; linkEl.style.pointerEvents='none';
       labelEl.textContent='Full listing not provided';
     }
-
     if(priceNum) document.getElementById('purchasePrice').value = priceNum;
-
     loadViewer(listing.splat_url);
     recalcBudget();
     updateFitRing();
@@ -863,9 +801,6 @@
     renderAdditionalListings(additionalListings);
   }
 
-  /* =========================================================
-     BOOT
-     ========================================================= */
   if(!hasListing){
     document.getElementById('noListingState').classList.remove('hidden');
   } else {
